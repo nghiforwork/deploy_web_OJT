@@ -1,0 +1,52 @@
+@import './variable.scss';
+@import './mixin.scss';
+
+//global class  ======================
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+.cyan-text {
+  color:  #1696A6;
+}
+
+.container {
+  max-width: 100%;
+  padding: unset;
+}
+
+.m_h {
+  min-height: 100vh;
+}
+
+.layout {
+  height: fit-content;
+  background: transparent;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.cap {
+  text-transform: capitalize;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+sub,
+sup {
+  font-size: 75% ;
+  top: -0.5em;
+}
+
+.disable {
+  opacity: 0.5;
+}
+
+
+.text-danger {
+  margin-top: 0.5rem;
+}
+

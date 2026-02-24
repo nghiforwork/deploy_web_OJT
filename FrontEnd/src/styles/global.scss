@@ -1,0 +1,25 @@
+/* global.scss */
+
+
+.body {
+    .section-1 {
+        background: red;
+    }
+    .section-2 {
+        background: green;
+    }
+}
+
+/* css */
+// .body .section-1 {
+//     background: red;
+// }
+
+// .body .section-2 {
+//     background: green;
+// }
+
+// Global styles 
+@import './style.scss';
+@import './variable.scss';
+@import './mixin.scss';
