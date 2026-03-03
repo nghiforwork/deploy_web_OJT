@@ -1,0 +1,172 @@
+@import "@/styles/variable.scss";
+
+.hero {
+  background-color: #f2f0f1;
+  position: relative;
+  overflow: hidden;
+
+  .container {
+    display: flex;
+    align-items: stretch; // Cho phép imageWrapper cao bằng content
+    justify-content: space-between;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 80px; // Điều chỉnh lại padding theo chuẩn mẫu
+    position: relative;
+    min-height: 660px; // Đảm bảo chiều cao đủ cho layout desktop
+  }
+
+  .content {
+    flex: 0 0 55%; // Chiếm 55% chiều rộng
+    padding-top: 100px;
+    padding-bottom: 100px;
+    z-index: 2;
+
+    .title {
+      font-family: var(--font-integral);
+      font-size: 64px;
+      line-height: 1.1; // Chỉnh lại line-height cho khít hơn
+      font-weight: 900;
+      margin-bottom: 32px;
+      color: #000;
+      text-transform: uppercase;
+    }
+
+    .description {
+      font-family: var(--font-satoshi);
+      font-size: 16px;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.6);
+      margin-bottom: 48px;
+      max-width: 545px; // Giới hạn chiều rộng mô tả
+    }
+
+    .shopBtn {
+      background-color: #000;
+      color: #fff;
+      padding: 16px 68px;
+      border-radius: 62px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 48px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+    }
+  }
+
+  .stats {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+
+    .statItem {
+      h3 {
+        font-family: var(--font-satoshi);
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+      }
+      p {
+        font-family: var(--font-satoshi);
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.6);
+        margin: 0;
+      }
+    }
+
+    .divider {
+      width: 1px;
+      height: 74px;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .imageWrapper {
+    flex: 0 0 45%;
+    position: relative;
+    display: flex;
+    align-items: flex-end; // Đưa ảnh xuống đáy
+
+    img {
+      max-width: 100%;
+      height: auto;
+      object-fit: cover;
+    } 
+
+    .decorativeStar {
+      position: absolute;
+      color: #000;
+    }
+
+    .starLarge {
+      top: 10%;
+      right: 0;
+      width: 104px; // Kích thước theo mẫu
+      height: auto;
+    }
+
+    .starSmall {
+      top: 45%;
+      left: -10%; // Đưa ngôi sao nhỏ lấn sang phần text một chút
+      width: 56px;
+      height: auto;
+    }
+  }
+
+  .brandBar {
+    background-color: #000;
+    padding: 44px 100px;
+
+    .brandList {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap; // Cho phép xuống dòng nếu màn hình nhỏ
+      gap: 20px;
+
+      img {
+        height: 35px;
+        width: auto;
+        opacity: 1;
+        object-fit: contain;
+      }
+    }
+  }
+}
+
+// Responsive cho Mobile
+@media (max-width: 768px) {
+  .hero {
+    .content {
+      .title {
+        font-size: 36px;
+      }
+      .stats {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+    .container {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .brandBar {
+      padding: 30px 0;
+
+      .brandList {
+        justify-content: center;
+        gap: 30px 40px;
+
+        img {
+          height: 25px;
+        }
+      }
+    }
+  }
+}
