@@ -1,0 +1,120 @@
+@import "@/styles/variable.scss";
+
+.header {
+  width: 100%;
+}
+
+.promoBar {
+  background-color: #000;
+  color: #fff;
+  padding: 9px 100px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  text-align: center;
+
+  p {
+    grid-column: 2;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  a {
+    color: #fff; // Chỉnh màu chữ của thẻ Link
+    text-decoration: underline;
+    font-weight: 500;
+
+    &:hover {
+      color: #ccc; // Màu khi di chuột vào (tùy chọn)
+    }
+  }
+
+  .closeIcon {
+    grid-column: 3;
+    justify-self: end;
+    cursor: pointer;
+    display: block;
+  }
+}
+
+.mainNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 100px;
+  background-color: #fff;
+
+  .logo a {
+    font-family: var(--font-integral);
+    font-size: 32px;
+    font-weight: 900;
+    text-decoration: none;
+    color: #000;
+  }
+}
+
+.navLinks {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+
+  li a {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: #000;
+    font-size: 16px;
+  }
+}
+
+.searchWrapper {
+  flex: 1;
+  margin: 0 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .searchIcon {
+    position: absolute;
+    left: 16px;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  .searchInput {
+    width: 100%;
+    background-color: #f0f0f0;
+    border: none;
+    padding: 12px 12px 12px 48px;
+    border-radius: 62px;
+    outline: none;
+    font-size: 16px;
+
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.4);
+      font-family: var(--font-satoshi);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+
+  a {
+    color: #000;
+    transition: opacity 0.2s;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+// Responsive cho mobile (ẩn bớt link và search)
+@media (max-width: 1024px) {
+  .navLinks,
+  .searchWrapper {
+    display: none;
+  }
+}

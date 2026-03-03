@@ -1,25 +1,13 @@
-/* global.scss */
-
-
-.body {
-    .section-1 {
-        background: red;
-    }
-    .section-2 {
-        background: green;
-    }
-}
-
-/* css */
-// .body .section-1 {
-//     background: red;
-// }
-
-// .body .section-2 {
-//     background: green;
-// }
-
-// Global styles 
 @import './style.scss';
 @import './variable.scss';
 @import './mixin.scss';
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+  text-transform: uppercase;
+}
+
+body {
+  font-family: $font-body;
+  -webkit-font-smoothing: antialiased;
+}
