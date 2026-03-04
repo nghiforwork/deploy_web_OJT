@@ -1,0 +1,87 @@
+@import "@/styles/variable.scss";
+
+.card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .imageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f3f4f6;
+    border-radius: 25px;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .img {
+      object-fit: contain;
+      object-position: center;
+    }
+  }
+
+  .name {
+    font-family: $font-body;
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ratingGroup {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 12px;
+
+    .stars {
+      display: flex;
+      gap: 5px;
+    }
+
+    .score {
+      font-family: $font-body;
+      font-size: 14px;
+      .total {
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+  }
+
+  .priceGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .price {
+      font-family: $font-body;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .oldPrice {
+      font-family: $font-body;
+      font-size: 24px;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.4);
+      text-decoration: line-through;
+    }
+
+    .discountBadge {
+      background: rgba(255, 51, 51, 0.1);
+      color: #ff3333;
+      padding: 6px 12px;
+      border-radius: 62px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+  }
+}
