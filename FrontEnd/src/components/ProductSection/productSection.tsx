@@ -6,11 +6,12 @@ import { Product } from '@/types/product';
 interface ProductSectionProps {
   title: string;
   products: Product[];
+  hideBorder?: boolean;
 }
 
-export default function ProductSection({ title, products }: ProductSectionProps) {
+export default function ProductSection({ title, products, hideBorder }: ProductSectionProps) {
   return (
-    <section className={styles.section}>
+    <section className={`${styles.section} ${hideBorder ? styles.noBorder : ''}`}>
       <div className={styles.container}> 
         <h2 className={styles.title}>{title}</h2>
         <div className={styles.grid}>
