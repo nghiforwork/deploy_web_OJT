@@ -21,12 +21,12 @@
   }
 
   a {
-    color: #fff; // Chỉnh màu chữ của thẻ Link
+    color: #fff;
     text-decoration: underline;
     font-weight: 500;
 
     &:hover {
-      color: #ccc; // Màu khi di chuột vào (tùy chọn)
+      color: #ccc;
     }
   }
 
@@ -58,14 +58,78 @@
   display: flex;
   gap: 24px;
   list-style: none;
+  align-items: center;
 
-  li a {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    text-decoration: none;
-    color: #000;
-    font-size: 16px;
+  li {
+    position: relative;
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: #000;
+      font-size: 16px;
+      padding: 8px 0;
+    }
+  }
+}
+
+.hasDropdown {
+  &:hover {
+    .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    min-width: 150px;
+    padding: 10px 0;
+    list-style: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+
+    li a {
+      padding: 10px 20px;
+      font-size: 14px;
+
+      &:hover {
+        background-color: #f5f5f5;
+        color: #000;
+      }
+    }
+  }
+}
+
+.underlineAnimation {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease-out;
+  }
+
+  &:hover::after {
+    transform: scaleX(1);
   }
 }
 
@@ -111,10 +175,165 @@
   }
 }
 
-// Responsive cho mobile (ẩn bớt link và search)
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.burgerIcon {
+  display: none;
+  cursor: pointer;
+}
+
+.navItem {
+  color: #000;
+  transition: color 0.3s ease;
+  &:hover {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* --- MOBILE SIDEBAR --- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s ease;
+  z-index: 99;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100vh;
+  background: #fff;
+  z-index: 100;
+  padding: 15px;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &.sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .sidebarHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .logo {
+      font-family: var(--font-integral);
+      font-size: 24px;
+      font-weight: 900;
+    }
+  }
+}
+
+.mobileNavLinks {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-left: inherit;
+
+  li a,
+  .mobileShopToggle {
+    font-size: 18px;
+    color: #000;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+}
+
+.mobileDropdown {
+  list-style: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding-left: 15px;
+
+  &.show {
+    max-height: 100px;
+    margin-top: 10px;
+  }
+
+  li a {
+    font-size: 16px;
+    padding: 8px 0;
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.rotated {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+/* --- RESPONSIVE --- */
 @media (max-width: 1024px) {
   .navLinks,
   .searchWrapper {
+    display: none;
+  }
+
+  .burgerIcon {
+    display: block;
+  }
+
+  .searchIconMobile {
+    display: block;
+    cursor: pointer;
+  }
+
+  .promoBar {
+    padding: 9px 16px;
+    font-size: 12px;
+
+    p {
+      grid-column: 1 / span 3;
+      font-size: 12px;
+    }
+
+    .closeIcon {
+      display: none;
+    }
+  }
+
+  .mainNav {
+    padding: 16px 16px;
+  }
+
+  .logo a {
+    font-size: 24px;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .searchIconMobile {
+    display: none;
+  }
+  .sidebar,
+  .overlay {
     display: none;
   }
 }
