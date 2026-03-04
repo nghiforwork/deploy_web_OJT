@@ -6,7 +6,6 @@ export default function Hero() {
     <section className={styles.hero}>
       <div className="layout">
         <div className={styles.container}>
-          {/* LEFT CONTENT */}
           <div className={styles.content}>
             <h1 className={styles.title}>
               FIND CLOTHES THAT MATCHES YOUR STYLE
@@ -42,9 +41,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT IMAGE SECTION */}
           <div className={styles.imageWrapper}>
-            {/* Tạo Box mới để chỉ cắt riêng ảnh model */}
             <div className={styles.imageBox}>
               <Image
                 src="/images/hero/couple.jpg"
@@ -55,7 +52,6 @@ export default function Hero() {
               />
             </div>
 
-            {/* Các ngôi sao nằm ngoài imageBox nên sẽ không bị overflow:hidden ảnh hưởng */}
             <div className={`${styles.decorativeStar} ${styles.starLarge}`}>
               <Image
                 src="/images/hero/bigstar-icon.png"
@@ -77,7 +73,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* BRAND BAR - Đã được cấu hình margin âm để đè lên */}
       <div className={styles.brandBar}>
         <div className="layout">
           <div className={styles.brandList}>

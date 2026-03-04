@@ -1,3 +1,4 @@
+import DressStyle from "@/components/DressStyle/dressStyle";
 import Hero from "@/components/Hero/hero";
 import Navigation from "@/components/Navigation/navigation";
 import ProductSection from "@/components/ProductSection/productSection";
@@ -77,7 +78,8 @@ export default function Home() {
       <Navigation />
       <Hero />
       <ProductSection title="NEW ARRIVALS" products={newArrivals} />
-      <ProductSection title="TOP SELLING" products={topSelling} />
+      <ProductSection title="TOP SELLING" products={topSelling} hideBorder />
+      <DressStyle />
     </main>
   );
 }
