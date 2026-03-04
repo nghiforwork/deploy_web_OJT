@@ -26,25 +26,23 @@ export default function Navigation() {
                 <div className={styles.leftSection}>
                     <Menu className={styles.burgerIcon} size={24} onClick={toggleMenu} />
                     <div className={styles.logo}>
-                        <Link href="/">SHOP.CO</Link>
+                        <Link href="#">SHOP.CO</Link>
                     </div>
                 </div>
 
-                {/* Desktop Nav Links */}
                 <ul className={styles.navLinks}>
                     <li className={styles.hasDropdown}>
-                        <Link href="/#">Shop <ChevronDown size={16} /></Link>
+                        <Link href="#">Shop <ChevronDown size={16} /></Link>
                         <ul className={styles.dropdown}>
-                            <li><Link href="/shop/male">Male</Link></li>
-                            <li><Link href="/shop/female">Female</Link></li>
+                            <li><Link href="#">Male</Link></li>
+                            <li><Link href="#">Female</Link></li>
                         </ul>
                     </li>
-                    <li><Link href="/#" className={styles.underlineAnimation}>On Sale</Link></li>
-                    <li><Link href="/#" className={styles.underlineAnimation}>New Arrivals</Link></li>
-                    <li><Link href="/#" className={styles.underlineAnimation}>Brands</Link></li>
+                    <li><Link href="#" className={styles.underlineAnimation}>On Sale</Link></li>
+                    <li><Link href="#" className={styles.underlineAnimation}>New Arrivals</Link></li>
+                    <li><Link href="#" className={styles.underlineAnimation}>Brands</Link></li>
                 </ul>
 
-                {/* Mobile Sidebar & Overlay */}
                 <div className={`${styles.overlay} ${isMenuOpen ? styles.active : ""}`} onClick={toggleMenu}></div>
                 <div className={`${styles.sidebar} ${isMenuOpen ? styles.sidebarOpen : ""}`}>
                     <div className={styles.sidebarHeader}>
@@ -58,13 +56,13 @@ export default function Navigation() {
                                 Shop <ChevronDown size={18} className={isShopOpen ? styles.rotated : ""} />
                             </div>
                             <ul className={`${styles.mobileDropdown} ${isShopOpen ? styles.show : ""}`}>
-                                <li><Link href="/shop/male" onClick={toggleMenu}>Male</Link></li>
-                                <li><Link href="/shop/female" onClick={toggleMenu}>Female</Link></li>
+                                <li><Link href="#" onClick={toggleMenu}>Male</Link></li>
+                                <li><Link href="#" onClick={toggleMenu}>Female</Link></li>
                             </ul>
                         </li>
-                        <li><Link href="/#" className={styles.navItem} onClick={toggleMenu}>On Sale</Link></li>
-                        <li><Link href="/#" className={styles.navItem} onClick={toggleMenu}>New Arrivals</Link></li>
-                        <li><Link href="/#" className={styles.navItem} onClick={toggleMenu}>Brands</Link></li>
+                        <li><Link href="#" className={styles.navItem} onClick={toggleMenu}>On Sale</Link></li>
+                        <li><Link href="#" className={styles.navItem} onClick={toggleMenu}>New Arrivals</Link></li>
+                        <li><Link href="#" className={styles.navItem} onClick={toggleMenu}>Brands</Link></li>
                     </ul>
                 </div>
 
@@ -75,8 +73,8 @@ export default function Navigation() {
 
                 <div className={styles.actions}>
                     <Search className={styles.searchIconMobile} size={24} />
-                    <Link href="/#"><ShoppingCart size={24} /></Link>
-                    <Link href="/#"><CircleUserRound size={24} /></Link>
+                    <Link href="#"><ShoppingCart size={24} /></Link>
+                    <Link href="#"><CircleUserRound size={24} /></Link>
                 </div>
             </nav>
         </header>
