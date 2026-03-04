@@ -1,0 +1,72 @@
+// @import "@/styles/variable.scss";
+@use "@/styles/variable.scss" as v;
+
+.section {
+  padding: 72px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+
+  .container {
+    max-width: 1340px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .title {
+    font-family: v.$font-heading;
+    font-size: 48px;
+    text-align: center;
+    margin-bottom: 55px;
+    color: #000;
+
+    @media (max-width: 768px) {
+      font-size: 32px;
+      margin-bottom: 32px;
+    }
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 640px) {
+      display: flex;
+      overflow-x: auto;
+      padding-bottom: 20px;
+      gap: 16px;
+      & > div {
+        min-width: 200px;
+      }
+    }
+  }
+
+  .viewAllBtn {
+    display: block;
+    margin: 36px auto 0;
+    width: 218px;
+    padding: 16px 0;
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 62px;
+    background: #fff;
+    font-family: v.$font-body;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
