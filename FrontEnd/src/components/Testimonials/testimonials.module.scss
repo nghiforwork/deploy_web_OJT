@@ -40,7 +40,6 @@
 
 .sliderWrapper {
   position: relative;
-  // Hiệu ứng Fade 2 đầu bằng mask-image (Modern Browsers)
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -61,17 +60,26 @@
   display: flex;
   gap: 20px;
   overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 20px 10%; // Tạo khoảng đệm để card đầu không bị dính lề do mask-image
-  scrollbar-width: none; // Ẩn scrollbar trên Firefox
+  padding: 20px 10%;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none; 
 
   &::-webkit-scrollbar {
-    display: none; // Ẩn scrollbar trên Chrome/Safari
+    display: none;
+  }
+
+  &:active {
+    cursor: grabbing;
   }
 }
 
+.dragging {
+  cursor: grabbing;
+}
+
 .card {
-  flex: 0 0 400px; // Cố định chiều rộng card
+  flex: 0 0 400px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 20px;
   padding: 28px;
@@ -79,6 +87,7 @@
   flex-direction: column;
   gap: 12px;
   background: #fff;
+  pointer-events: none;
 
   .rating {
     display: flex;
@@ -113,7 +122,6 @@
     line-height: 1.6;
     color: rgba(0, 0, 0, 0.6);
     margin: 0;
-    // Xử lý khi text quá dài (line-clamp)
     display: -webkit-box;
     -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
@@ -134,7 +142,7 @@
   }
 
   .card {
-    flex: 0 0 310px; // Card nhỏ hơn trên mobile
+    flex: 0 0 310px;
     padding: 24px;
   }
 }
