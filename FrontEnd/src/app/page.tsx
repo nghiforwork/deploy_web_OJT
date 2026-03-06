@@ -2,6 +2,7 @@ import DressStyle from "@/components/DressStyle/dressStyle";
 import Hero from "@/components/Hero/hero";
 import Navigation from "@/components/Navigation/navigation";
 import ProductSection from "@/components/ProductSection/productSection";
+import TestimonialSection from "@/components/Testimonials/TestimonialSection";
 import { Product } from "@/types/product";
 
 export default function Home() {
@@ -80,6 +81,7 @@ export default function Home() {
       <ProductSection title="NEW ARRIVALS" products={newArrivals} />
       <ProductSection title="TOP SELLING" products={topSelling} hideBorder />
       <DressStyle />
+      <TestimonialSection />
     </main>
   );
 }
