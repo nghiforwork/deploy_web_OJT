@@ -1,0 +1,37 @@
+@import "@/styles/variable.scss";
+
+.categoryLayout {
+  display: grid;
+  grid-template-columns: 295px 1fr;
+  gap: 24px;
+  margin-bottom: 200px; // Tránh Newsletter đè lên
+
+  @media (max-width: 1024px) { grid-template-columns: 1fr; }
+}
+
+.mainContent {
+  .toolbar {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    h2 { font-family: var(--font-integral-cf); font-size: 32px; text-transform: uppercase; }
+    .meta { display: flex; gap: 12px; font-size: 16px; color: rgba(0, 0, 0, 0.6); strong { color: #000; } }
+  }
+
+  .productGrid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    @media (max-width: 768px) { grid-template-columns: repeat(2, 1fr); }
+  }
+}
+
+.divider { height: 1px; background-color: rgba(0, 0, 0, 0.1); margin: 32px 0; }
+
+.pagination {
+  display: flex; justify-content: space-between; align-items: center;
+  .navBtn { padding: 8px 16px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; background: #fff; font-weight: 500; cursor: pointer; }
+  .pages {
+    display: flex; gap: 8px; align-items: center;
+    button {
+      width: 40px; height: 40px; border-radius: 8px; border: none; background: transparent; cursor: pointer;
+      &.activePage { background-color: rgba(0, 0, 0, 0.06); }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+@import "@/styles/variable.scss";
+
+.sidebar {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 24px;
+  height: fit-content;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+    h3 { font-size: 20px; font-weight: 700; margin: 0; }
+  }
+}
+
+.section {
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  &:last-of-type { border-bottom: none; }
+  h4 { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; }
+}
+
+.list {
+  list-style: none; padding: 0; margin: 0;
+  .listItem {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; color: rgba(0, 0, 0, 0.6); cursor: pointer;
+    &:hover { color: #000; }
+  }
+}
+
+.priceSlider {
+  padding: 10px 0;
+  .track {
+    height: 6px; background: #f0f0f0; border-radius: 3px; position: relative; margin-bottom: 15px;
+    .range { position: absolute; height: 100%; background: #000; border-radius: 3px; }
+    .thumb { position: absolute; width: 20px; height: 20px; background: #000; border-radius: 50%; top: 50%; transform: translate(-50%, -50%); }
+  }
+  .priceLabels { display: flex; justify-content: center; gap: 10px; font-weight: 700; font-size: 14px; }
+}
+
+.colorsGrid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  .colorCircle {
+    width: 37px; height: 37px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    &.white { border-color: rgba(0, 0, 0, 0.2); }
+  }
+}
+
+.sizesGrid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  button {
+    padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 62px;
+    color: rgba(0, 0, 0, 0.6); font-size: 14px; cursor: pointer;
+    &.activeSize { background: #000; color: #fff; }
+  }
+}
+
+.applyBtn {
+  width: 100%; padding: 16px; background: #000; color: #fff; border: none;
+  border-radius: 62px; font-weight: 500; cursor: pointer;
+}
