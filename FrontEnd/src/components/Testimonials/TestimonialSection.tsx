@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import TestimonialCard from "./TestimonialCard";
 import styles from "./testimonials.module.scss";
@@ -51,6 +51,10 @@ const TESTIMONIAL_DATA: Testimonial[] = [
 const TestimonialSection = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
   const scroll = (direction: "left" | "right") => {
     if (sliderRef.current) {
       const scrollAmount = 400;
@@ -59,6 +63,26 @@ const TestimonialSection = () => {
         behavior: "smooth",
       });
     }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!sliderRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleMouseEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    e.preventDefault();
+
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
   };
 
   return (
@@ -78,7 +102,14 @@ const TestimonialSection = () => {
       </div>
 
       <div className={styles.sliderWrapper}>
-        <div className={styles.slider} ref={sliderRef}>
+        <div
+          className={`${styles.slider} ${isDragging ? styles.dragging : ""}`}
+          ref={sliderRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseEnd}
+          onMouseUp={handleMouseEnd}
+          onMouseMove={handleMouseMove}
+        >
           {TESTIMONIAL_DATA.map((item) => (
             <TestimonialCard
               key={item.id}
