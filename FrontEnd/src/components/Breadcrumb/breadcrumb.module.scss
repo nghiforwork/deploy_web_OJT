@@ -1,0 +1,19 @@
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.6);
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    &:hover { color: #000; }
+  }
+
+  span {
+    color: #000;
+    font-weight: 500;
+  }
+}
