@@ -1,9 +1,10 @@
 "use client";
 import React, { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import TestimonialCard from "./TestimonialCard";
 import styles from "./testimonials.module.scss";
 import { Testimonial } from "@/types/testimonial";
+import TestimonialCard from "./testimonialCard";
+
 
 const TESTIMONIAL_DATA: Testimonial[] = [
   {
