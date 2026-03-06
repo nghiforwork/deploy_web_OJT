@@ -1,0 +1,234 @@
+@use "@/styles/variable.scss" as v;
+
+.footer {
+  background-color: #F2F2F2;
+  padding-top: 50px;
+  position: relative;
+  margin-top: 140px;
+}
+
+/* Newsletter Section */
+.newsletterBanner {
+  background-color: #000;
+  border-radius: 20px;
+  padding: 36px 64px;
+
+  margin: -140px auto 50px; // -140px để kéo lên, auto để căn giữa, 50px tạo khoảng cách với nội dung dưới
+  // width: calc(100% - 32px);
+  max-width: 1240px;
+
+  z-index: 5;
+  position: relative;
+
+  .newsletterContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      text-align: center;
+      gap: 32px;
+    }
+  }
+
+  .newsletterHeading {
+    font-family: v.$font-heading;
+    color: #fff;
+    font-size: 40px;
+    line-height: 1.1;
+    margin: 0;
+    flex: 0 0 50%;
+    text-transform: uppercase;
+
+    @media (max-width: 1024px) {
+      font-size: 32px;
+    }
+  }
+
+  .newsletterForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .inputWrapper {
+    position: relative;
+    background-color: #fff;
+    border-radius: 62px;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+
+    .mailIcon {
+      color: rgba(0, 0, 0, 0.4);
+      margin-right: 12px;
+    }
+
+    .emailInput {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-family: v.$font-body;
+      font-size: 16px;
+      &::placeholder { color: rgba(0, 0, 0, 0.4); }
+    }
+  }
+
+  .subscribeBtn {
+    background-color: #fff;
+    color: #000;
+    border: none;
+    padding: 12px 0;
+    border-radius: 62px;
+    font-family: v.$font-body;
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+}
+
+/* Main Content */
+.footerMain {
+  padding-bottom: 80px;
+  max-width: 1360px;      // Khớp với max-width của newsletterBanner
+  margin: 0 auto;         // Căn giữa nội dung
+  width: calc(100% - 32px); // Khớp với cách tính width của banner (trừ 16px mỗi bên)
+  
+  @media (max-width: 1024px) { // Hoặc 768px tùy biến của bạn
+    width: calc(100% - 32px); 
+  }
+}
+
+.footerGrid {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(4, 1fr);
+  gap: 60px;
+  margin-bottom: 50px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.brandColumn {
+  @media (max-width: 1024px) {
+    grid-column: span 3;
+  }
+  @media (max-width: 768px) {
+    grid-column: span 2;
+  }
+
+  .brandLogo {
+    font-family: v.$font-heading;
+    font-size: 32px;
+    margin-bottom: 25px;
+    color: #000;
+  }
+
+  .brandDesc {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 35px;
+    // max-width: 250px;
+  }
+
+  .socialIcons {
+    display: flex;
+    gap: 12px;
+
+    .socialLink {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+      color: #000;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #000;
+        color: #fff;
+      }
+    }
+  }
+}
+
+.linkColumn {
+  .linkTitle {
+    font-family: v.$font-body;
+    font-weight: 700;
+    letter-spacing: 3px;
+    font-size: 16px;
+    margin-bottom: 25px;
+    color: #000;
+  }
+
+  .linkList {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .footerLink {
+      text-decoration: none;
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 16px;
+      transition: color 0.2s;
+      &:hover { color: #000; }
+    }
+  }
+}
+
+/* Bottom Bar */
+.footerBottom {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .copyright {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+  }
+
+  .paymentIcons {
+    display: flex;
+    gap: 12px;
+
+    .paymentBadge {
+      background: #fff;
+      border: 1px solid #d6d6d6;
+      border-radius: 5px;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
