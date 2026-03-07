@@ -67,36 +67,92 @@
   }
 }
 
-.priceSlider {
+.priceSliderContainer {
   padding: 10px 0;
-  .track {
-    height: 6px;
-    background: #f0f0f0;
-    border-radius: 3px;
-    position: relative;
-    margin-bottom: 15px;
-    .range {
-      position: absolute;
-      height: 100%;
-      background: #000;
-      border-radius: 3px;
-    }
-    .thumb {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: #000;
-      border-radius: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
+}
+
+.priceSlider {
+  position: relative;
+  height: 20px;
+  margin-bottom: 15px;
+}
+
+/* Ẩn giao diện mặc định của input range nhưng giữ vùng tương tác */
+.rangeInput {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  pointer-events: none; // Cho phép click xuyên qua input
+  appearance: none;
+  -webkit-appearance: none;
+  z-index: 2;
+
+  &::-webkit-slider-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: transparent; 
+    pointer-events: auto;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
   }
-  .priceLabels {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 14px;
+
+  &::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: transparent;
+    pointer-events: auto;
+    cursor: pointer;
+    border: none;
+  }
+}
+
+.sliderControl {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #f0f0f0;
+  border-radius: 3px;
+  z-index: 1;
+
+  .rangeProgress {
+    position: absolute;
+    height: 100%;
+    background: #000;
+    border-radius: 3px;
+  }
+
+  .thumb {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #000;
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    pointer-events: none; 
+  }
+}
+
+.priceLabels {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 10px;
+  
+  span {
+    color: #000;
   }
 }
 
@@ -113,6 +169,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: transform 0.2s ease;
+    &.active {
+      transform: scale(1.1);
+    }
     &.white {
       border-color: rgba(0, 0, 0, 0.2);
     }
@@ -123,6 +183,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+
   button {
     padding: 10px 20px;
     background: #f0f0f0;
@@ -131,9 +192,20 @@
     color: rgba(0, 0, 0, 0.6);
     font-size: 14px;
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #e2e2e2;
+      color: #000;
+    }
+
     &.activeSize {
       background: #000;
       color: #fff;
+      
+      &:hover {
+        background: #333;
+      }
     }
   }
 }
@@ -146,5 +218,6 @@
   border: none;
   border-radius: 62px;
   font-weight: 500;
+  font-size: 16px;
   cursor: pointer;
 }

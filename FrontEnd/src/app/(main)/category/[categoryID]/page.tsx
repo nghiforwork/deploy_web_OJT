@@ -7,6 +7,7 @@ import FilterSidebar from "@/components/FilterSidebar/filterSidebar";
 import Breadcrumb from "@/components/Breadcrumb/breadcrumb";
 import { Product } from "@/types/product";
 import styles from "./category.module.scss";
+import SortDropdown from "@/components/SortDropdown/sortDropdown";
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -29,6 +30,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 120,
     rating: 5.0,
     image: "/images/products/black-tshirt.png",
+    originalPrice: 160,
     discountLabel: "-30%",
   },
   {
@@ -37,6 +39,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 240,
     rating: 4.5,
     image: "/images/products/blue-jeans.png",
+    originalPrice: 160,
     discountLabel: "-20%",
   },
   {
@@ -52,6 +55,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 130,
     rating: 4.5,
     image: "/images/products/orange-tshirt.png",
+    originalPrice: 160,
     discountLabel: "-30%",
   },
   {
@@ -60,6 +64,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 212,
     rating: 5.0,
     image: "/images/products/green-shirt.png",
+    originalPrice: 160,
     discountLabel: "-20%",
   },
   {
@@ -100,9 +105,7 @@ export default async function CategoryPage({
               <h2>{categoryName}</h2>
               <div className={styles.meta}>
                 <span>Showing 1-9 of 100 Products</span>
-                <div className={styles.sortBy}>
-                  Sort by: <strong>Most Popular</strong>
-                </div>
+                <SortDropdown />
               </div>
             </div>
 

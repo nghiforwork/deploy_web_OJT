@@ -26,7 +26,7 @@ export default function Navigation() {
                 <div className={styles.leftSection}>
                     <Menu className={styles.burgerIcon} size={24} onClick={toggleMenu} />
                     <div className={styles.logo}>
-                        <Link href="#">SHOP.CO</Link>
+                        <Link href="/">SHOP.CO</Link>
                     </div>
                 </div>
 

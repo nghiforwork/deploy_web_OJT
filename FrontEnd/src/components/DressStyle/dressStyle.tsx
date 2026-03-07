@@ -38,7 +38,7 @@ export default function DressStyle() {
         <div className={styles.grid}>
           {STYLES_DATA.map((item) => (
             <Link
-              href="#"
+              href="/category/casual"
               key={item.id}
               className={`${styles.card} ${item.className}`}
             >
