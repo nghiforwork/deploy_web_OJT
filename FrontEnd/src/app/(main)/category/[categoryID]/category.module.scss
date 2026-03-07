@@ -11,8 +11,7 @@
     grid-template-columns: 1fr;
 
     .sidebar {
-      position: static;
-      max-height: none;
+      max-height: fit-content;
     }
   }
 }
@@ -31,9 +30,25 @@
       align-items: center;
       gap: 12px;
       font-size: 16px;
+      margin-left: 10px;
       color: rgba(0, 0, 0, 0.6);
       strong {
         color: #000;
+      }
+    }
+
+    .mobileFilterBtn {
+      display: none;
+      @media (max-width: 1024px) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
       }
     }
   }
