@@ -1,5 +1,5 @@
-"use client";
-import React from "react";
+"use client"
+import React, { useState, use } from "react";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
 import ProductCard from "@/components/ProductCard/productCard";
@@ -8,6 +8,7 @@ import Breadcrumb from "@/components/Breadcrumb/breadcrumb";
 import { Product } from "@/types/product";
 import styles from "./category.module.scss";
 import SortDropdown from "@/components/SortDropdown/sortDropdown";
+import { SlidersHorizontal } from "lucide-react";
 
 const MOCK_PRODUCTS: Product[] = [
   {
@@ -83,13 +84,15 @@ const MOCK_PRODUCTS: Product[] = [
   },
 ];
 
-export default async function CategoryPage({
+export default function CategoryPage({
   params,
 }: {
   params: Promise<{ categoryID: string }>;
 }) {
-  const { categoryID } = await params;
+  const { categoryID } = use(params);
   const categoryName = categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
     <>
@@ -98,7 +101,10 @@ export default async function CategoryPage({
         <Breadcrumb category={categoryName} />
 
         <div className={styles.categoryLayout}>
-          <FilterSidebar />
+          <FilterSidebar 
+            isOpen={isFilterOpen} 
+            onClose={() => setIsFilterOpen(false)} 
+          />
 
           <div className={styles.mainContent}>
             <div className={styles.toolbar}>
@@ -106,6 +112,13 @@ export default async function CategoryPage({
               <div className={styles.meta}>
                 <span>Showing 1-9 of 100 Products</span>
                 <SortDropdown />
+
+                <button 
+                  className={styles.mobileFilterBtn}
+                  onClick={() => setIsFilterOpen(true)}
+                >
+                  <SlidersHorizontal size={20} />
+                </button>
               </div>
             </div>
 
