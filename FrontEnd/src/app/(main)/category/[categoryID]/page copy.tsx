@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import React, { useState, use } from "react";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
@@ -91,36 +90,30 @@ export default function CategoryPage({
   params: Promise<{ categoryID: string }>;
 }) {
   const { categoryID } = use(params);
-  const categoryName =
-    categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
+  const categoryName = categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
     <>
       <Navigation />
-
       <main className="layout">
         <Breadcrumb category={categoryName} />
 
         <div className={styles.categoryLayout}>
-          {/* Desktop Sidebar */}
-          <FilterSidebar
-            isOpen={isFilterOpen}
-            onClose={() => setIsFilterOpen(false)}
+          <FilterSidebar 
+            isOpen={isFilterOpen} 
+            onClose={() => setIsFilterOpen(false)} 
           />
 
           <div className={styles.mainContent}>
             <div className={styles.toolbar}>
               <h2>{categoryName}</h2>
-
               <div className={styles.meta}>
                 <span>Showing 1-9 of 100 Products</span>
-
                 <SortDropdown />
 
-                {/* Mobile Filter Button */}
-                <button
+                <button 
                   className={styles.mobileFilterBtn}
                   onClick={() => setIsFilterOpen(true)}
                 >
@@ -139,7 +132,6 @@ export default function CategoryPage({
 
             <div className={styles.pagination}>
               <button className={styles.navBtn}>Previous</button>
-
               <div className={styles.pages}>
                 <button className={styles.activePage}>1</button>
                 <button>2</button>
@@ -147,13 +139,11 @@ export default function CategoryPage({
                 <span>...</span>
                 <button>10</button>
               </div>
-
               <button className={styles.navBtn}>Next</button>
             </div>
           </div>
         </div>
       </main>
-
       <Footer />
     </>
   );
