@@ -7,14 +7,12 @@
   margin-top: 140px;
 }
 
-/* Newsletter Section */
 .newsletterBanner {
   background-color: #000;
   border-radius: 20px;
   padding: 36px 64px;
 
-  margin: -140px auto 50px; // -140px để kéo lên, auto để căn giữa, 50px tạo khoảng cách với nội dung dưới
-  // width: calc(100% - 32px);
+  margin: -140px auto 50px;
   max-width: 1240px;
 
   z-index: 5;
@@ -147,7 +145,6 @@
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 35px;
-    // max-width: 250px;
   }
 
   .socialIcons {

@@ -1,4 +1,4 @@
-@import "@/styles/variable.scss";
+@use "@/styles/variable.scss" as v;
 
 .overlay {
   display: none;

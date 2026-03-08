@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from "./navigation.module.scss";
 import { Search, ShoppingCart, CircleUserRound, ChevronDown, X, Menu } from "lucide-react";
 
 export default function Navigation() {
+    const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
 
@@ -18,7 +20,7 @@ export default function Navigation() {
     return (
         <header className={styles.header}>
             <div className={styles.promoBar}>
-                <p>Sign up and get 20% off to your first order. <Link href="/signup">Sign Up Now</Link></p>
+                <p>Sign up and get 20% off to your first order. <Link href={`${pathname}?auth=signup`}>Sign Up Now</Link></p>
                 <X className={styles.closeIcon} size={16} />
             </div>
 
@@ -73,8 +75,8 @@ export default function Navigation() {
 
                 <div className={styles.actions}>
                     <Search className={styles.searchIconMobile} size={24} />
-                    <Link href="#"><ShoppingCart size={24} /></Link>
-                    <Link href="#"><CircleUserRound size={24} /></Link>
+                    <Link href="/cart" aria-label="Cart"><ShoppingCart size={24} /></Link>
+                    <Link href={`${pathname}?auth=login`} aria-label="Login"><CircleUserRound size={24} /></Link>
                 </div>
             </nav>
         </header>

@@ -1,0 +1,292 @@
+// Create Account form – responsive, SCSS only (no Tailwind)
+$bg-dark: #e5e5e5;
+$card-bg: #ffffff;
+$text-heading: #000000;
+$text-gray: #6b7280;
+$text-light: #9ca3af;
+$input-bg: #f3f4f6;
+$border-gray: #e5e7eb;
+$btn-primary-bg: #000000;
+$radius-card: 24px;
+$radius-input: 10px;
+$radius-pill: 50px;
+
+.signupWrapper {
+  min-height: 100vh;
+  background-color: $bg-dark;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.card {
+  width: 100%;
+  max-width: 450px;
+  background-color: $card-bg;
+  border-radius: $radius-card;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.heading {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: $text-heading;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: $text-gray;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.nameRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: $text-heading;
+  font-weight: 500;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: $input-bg;
+  border-radius: $radius-input;
+  border: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 2.75rem 0.75rem 1rem;
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: $radius-input;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-gray;
+  }
+}
+
+.inputIcon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-heading;
+  pointer-events: none;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.iconButton {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-heading;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+.passwordRequirements {
+  margin: 0.25rem 0 0;
+  padding-left: 1.25rem;
+  font-size: 12px;
+  color: $text-light;
+  list-style: none;
+
+  li {
+    position: relative;
+    margin-bottom: 0.25rem;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -1rem;
+      top: 0.4em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: $text-light;
+    }
+  }
+}
+
+.termsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  border: 1px solid $border-gray;
+  accent-color: $text-heading;
+  cursor: pointer;
+}
+
+.termsLabel {
+  font-size: 0.875rem;
+  color: $text-gray;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.termsLink {
+  color: $text-heading;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: $btn-primary-bg;
+  border: none;
+  border-radius: $radius-pill;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: $border-gray;
+  }
+}
+
+.dividerText {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: $text-light;
+  white-space: nowrap;
+}
+
+.socialGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background-color: $card-bg;
+  border: 1px solid $border-gray;
+  border-radius: $radius-input;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $input-bg;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+  }
+}
+
+.socialIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: $text-gray;
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+}
+
+.signinLink {
+  color: $text-heading;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
