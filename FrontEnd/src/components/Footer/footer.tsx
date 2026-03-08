@@ -1,27 +1,37 @@
-"use client"
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Mail, Twitter, Facebook, Instagram, Github } from 'lucide-react';
-import styles from './footer.module.scss';
+"use client";
+import React from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Mail, Twitter, Facebook, Instagram, Github } from "lucide-react";
+import styles from "./footer.module.scss";
 
 const FOOTER_LINKS = [
   {
-    title: 'COMPANY',
-    links: ['About', 'Features', 'Works', 'Career']
+    title: "COMPANY",
+    links: ["About", "Features", "Works", "Career"],
   },
   {
-    title: 'HELP',
-    links: ['Customer Support', 'Delivery Details', 'Terms & Conditions', 'Privacy Policy']
+    title: "HELP",
+    links: [
+      "Customer Support",
+      "Delivery Details",
+      "Terms & Conditions",
+      "Privacy Policy",
+    ],
   },
   {
-    title: 'FAQ',
-    links: ['Account', 'Manage Deliveries', 'Orders', 'Payments']
+    title: "FAQ",
+    links: ["Account", "Manage Deliveries", "Orders", "Payments"],
   },
   {
-    title: 'RESOURCES',
-    links: ['Free eBooks', 'Development Tutorial', 'How to - Blog', 'Youtube Playlist']
-  }
+    title: "RESOURCES",
+    links: [
+      "Free eBooks",
+      "Development Tutorial",
+      "How to - Blog",
+      "Youtube Playlist",
+    ],
+  },
 ];
 
 const Footer = () => {
@@ -33,12 +43,15 @@ const Footer = () => {
             <h2 className={styles.newsletterHeading}>
               STAY UP TO DATE ABOUT OUR LATEST OFFERS
             </h2>
-            <form className={styles.newsletterForm} onSubmit={(e) => e.preventDefault()}>
+            <form
+              className={styles.newsletterForm}
+              onSubmit={(e) => e.preventDefault()}
+            >
               <div className={styles.inputWrapper}>
                 <Mail className={styles.mailIcon} size={20} />
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address" 
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
                   className={styles.emailInput}
                 />
               </div>
@@ -54,13 +67,22 @@ const Footer = () => {
             <div className={styles.brandColumn}>
               <h3 className={styles.brandLogo}>SHOP.CO</h3>
               <p className={styles.brandDesc}>
-                We have clothes that suits your style and which you're proud to wear. From women to men.
+                We have clothes that suits your style and which you're proud to
+                wear. From women to men.
               </p>
               <div className={styles.socialIcons}>
-                <Link href="#" className={styles.socialLink}><Twitter size={18} fill="currentColor" /></Link>
-                <Link href="#" className={styles.socialLink}><Facebook size={18} fill="currentColor" /></Link>
-                <Link href="#" className={styles.socialLink}><Instagram size={18} /></Link>
-                <Link href="#" className={styles.socialLink}><Github size={18} fill="currentColor" /></Link>
+                <Link href="#" className={styles.socialLink}>
+                  <Twitter size={18} fill="currentColor" />
+                </Link>
+                <Link href="#" className={styles.socialLink}>
+                  <Facebook size={18} fill="currentColor" />
+                </Link>
+                <Link href="#" className={styles.socialLink}>
+                  <Instagram size={18} />
+                </Link>
+                <Link href="#" className={styles.socialLink}>
+                  <Github size={18} fill="currentColor" />
+                </Link>
               </div>
             </div>
 
@@ -70,7 +92,9 @@ const Footer = () => {
                 <ul className={styles.linkList}>
                   {group.links.map((link, i) => (
                     <li key={i}>
-                      <Link href="#" className={styles.footerLink}>{link}</Link>
+                      <Link href="#" className={styles.footerLink}>
+                        {link}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -83,11 +107,46 @@ const Footer = () => {
               Shop.co © 2000–2023, All Rights Reserved
             </p>
             <div className={styles.paymentIcons}>
-              <div className={styles.paymentBadge}><Image src="/images/footer/VISA.jpeg" alt="Visa" width={40} height={25} /></div>
-              <div className={styles.paymentBadge}><Image src="/images/footer/mastercard.svg" alt="Mastercard" width={40} height={25} /></div>
-              <div className={styles.paymentBadge}><Image src="/images/footer/paypal.png" alt="Paypal" width={40} height={25} /></div>
-              <div className={styles.paymentBadge}><Image src="/images/footer/applepay.png" alt="Apple Pay" width={40} height={25} /></div>
-              <div className={styles.paymentBadge}><Image src="/images/footer/googlepay.png" alt="Google Pay" width={40} height={25} /></div>
+              <div className={styles.paymentBadge}>
+                <Image
+                  src="/images/footer/VISA.jpeg"
+                  alt="Visa"
+                  width={35}
+                  height={20}
+                />
+              </div>
+              <div className={styles.paymentBadge}>
+                <Image
+                  src="/images/footer/mastercard.svg"
+                  alt="Mastercard"
+                  width={30}
+                  height={20}
+                />
+              </div>
+              <div className={styles.paymentBadge}>
+                <Image
+                  src="/images/footer/paypal.jpeg"
+                  alt="Paypal"
+                  width={35}
+                  height={20}
+                />
+              </div>
+              <div className={styles.paymentBadge}>
+                <Image
+                  src="/images/footer/applepay.png"
+                  alt="Apple Pay"
+                  width={30}
+                  height={20}
+                />
+              </div>
+              <div className={styles.paymentBadge}>
+                <Image
+                  src="/images/footer/googlepay.png"
+                  alt="Google Pay"
+                  width={35}
+                  height={20}
+                />
+              </div>
             </div>
           </div>
         </div>
