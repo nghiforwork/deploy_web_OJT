@@ -1,4 +1,4 @@
-@import "@/styles/variable.scss";
+@use "@/styles/variable.scss" as v;
 
 .overlay {
   display: none;
@@ -87,7 +87,7 @@
 .scrollContent {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px;
+  padding: 0 10px;
   
   &::-webkit-scrollbar { width: 0; }
 }

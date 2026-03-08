@@ -1,20 +1,18 @@
 @use "@/styles/variable.scss" as v;
 
 .footer {
-  background-color: #F2F2F2;
+  background-color: #f2f2f2;
   padding-top: 50px;
   position: relative;
   margin-top: 140px;
 }
 
-/* Newsletter Section */
 .newsletterBanner {
   background-color: #000;
   border-radius: 20px;
   padding: 36px 64px;
 
-  margin: -140px auto 50px; // -140px để kéo lên, auto để căn giữa, 50px tạo khoảng cách với nội dung dưới
-  // width: calc(100% - 32px);
+  margin: -140px auto 50px;
   max-width: 1240px;
 
   z-index: 5;
@@ -74,7 +72,9 @@
       width: 100%;
       font-family: v.$font-body;
       font-size: 16px;
-      &::placeholder { color: rgba(0, 0, 0, 0.4); }
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+      }
     }
   }
 
@@ -96,15 +96,16 @@
   }
 }
 
-/* Main Content */
 .footerMain {
   padding-bottom: 80px;
-  max-width: 1360px;      // Khớp với max-width của newsletterBanner
-  margin: 0 auto;         // Căn giữa nội dung
-  width: calc(100% - 32px); // Khớp với cách tính width của banner (trừ 16px mỗi bên)
-  
-  @media (max-width: 1024px) { // Hoặc 768px tùy biến của bạn
-    width: calc(100% - 32px); 
+  max-width: 1360px;
+  margin: 0 auto;
+  width: calc(
+    100% - 32px
+  );
+
+  @media (max-width: 1024px) {
+    width: calc(100% - 32px);
   }
 }
 
@@ -144,7 +145,6 @@
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 35px;
-    // max-width: 250px;
   }
 
   .socialIcons {
@@ -155,7 +155,7 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.1);
+      border: 1px solid rgba(0, 0, 0, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -193,12 +193,13 @@
       color: rgba(0, 0, 0, 0.6);
       font-size: 16px;
       transition: color 0.2s;
-      &:hover { color: #000; }
+      &:hover {
+        color: #000;
+      }
     }
   }
 }
 
-/* Bottom Bar */
 .footerBottom {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 25px;
@@ -220,15 +221,27 @@
   .paymentIcons {
     display: flex;
     gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
 
     .paymentBadge {
-      background: #fff;
-      border: 1px solid #d6d6d6;
+      width: 46px;
+      height: 30px;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.1);
       border-radius: 5px;
-      padding: 4px 8px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      padding: 4px;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain;
+      }
     }
   }
 }

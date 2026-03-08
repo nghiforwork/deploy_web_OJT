@@ -1,4 +1,4 @@
-@import "@/styles/variable.scss";
+@use "@/styles/variable.scss" as v;
 
 .header {
   width: 100%;
@@ -46,7 +46,7 @@
   background-color: #fff;
 
   .logo a {
-    font-family: var(--font-integral);
+    font-family: v.$font-heading;
     font-size: 32px;
     font-weight: 900;
     text-decoration: none;
@@ -157,7 +157,7 @@
 
     &::placeholder {
       color: rgba(0, 0, 0, 0.4);
-      font-family: var(--font-satoshi);
+      font-family: v.$font-body;
     }
   }
 }
@@ -235,7 +235,7 @@
     gap: 20px;
 
     .logo {
-      font-family: var(--font-integral);
+      font-family: v.$font-heading;
       font-size: 24px;
       font-weight: 900;
     }
