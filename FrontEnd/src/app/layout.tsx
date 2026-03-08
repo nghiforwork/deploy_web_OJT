@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/styles/global.scss";
 import localFont from "next/font/local";
+import AuthOverlay from "@/components/AuthOverlay/authOverlay";
 
 // Cấu hình font Integral CF
 const integralCF = localFont({
@@ -35,6 +36,7 @@ export default function RootLayout({
         className={`${integralCF.variable} ${satoshi.variable}`}
       >
         {children}
+        <AuthOverlay />
       </body>
     </html>
   );

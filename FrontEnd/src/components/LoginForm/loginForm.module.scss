@@ -1,0 +1,264 @@
+// Login form – responsive, SCSS only (no Tailwind)
+// Colors aligned with design specs
+$bg-page: #a3a3a3; // neutral-400
+$card-bg: #ffffff;
+$text-heading: #000000;
+$text-muted: #6b7280; // gray-500
+$text-divider: #9ca3af; // gray-400
+$input-bg: #f3f4f6; // gray-100
+$border-light: #e5e7eb; // gray-200
+$btn-bg: #000000;
+$radius-card: 1.5rem; // rounded-3xl
+$radius-input: 0.75rem; // rounded-xl
+$radius-pill: 9999px;
+
+.wrapper {
+  min-height: 100vh;
+  background-color: $bg-page;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.card {
+  width: 100%;
+  max-width: 28rem; // md:max-w-md (448px)
+  background-color: $card-bg;
+  border-radius: $radius-card;
+  padding: 2.5rem; // p-10
+  box-sizing: border-box;
+
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+  }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.heading {
+  font-size: 1.875rem; // text-3xl
+  font-weight: 700;
+  color: $text-heading;
+  margin: 0 0 0.5rem;
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: $text-muted;
+  margin: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: $text-heading;
+  font-weight: 500;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: $input-bg;
+  border-radius: $radius-input;
+  border: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 2.75rem 0.75rem 1rem;
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: $radius-input;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+}
+
+.inputIcon {
+  position: absolute;
+  right: 1rem;
+  color: $text-heading;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.iconButton {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-heading;
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+.iconButton .inputIcon {
+  position: static;
+  pointer-events: auto;
+}
+
+.optionsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rememberLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid $border-light;
+  accent-color: $text-heading;
+  cursor: pointer;
+}
+
+.rememberText {
+  font-size: 0.875rem;
+  color: $text-muted;
+}
+
+.forgotLink {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $text-heading;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: $btn-bg;
+  border: none;
+  border-radius: $radius-pill;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+  }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: $border-light;
+  }
+}
+
+.dividerText {
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: $text-divider;
+  white-space: nowrap;
+}
+
+.socialGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.socialBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background-color: $card-bg;
+  border: 1px solid $border-light;
+  border-radius: $radius-input;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $input-bg;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $text-heading;
+    outline-offset: 2px;
+  }
+}
+
+.socialIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.875rem;
+  color: $text-muted;
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+}
+
+.signupLink {
+  color: $text-heading;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
