@@ -1,4 +1,4 @@
-@import "@/styles/variable.scss";
+@use "@/styles/variable.scss" as v;
 
 .hero {
   background-color: #f2f0f1;
@@ -21,7 +21,7 @@
     z-index: 2;
 
     .title {
-      font-family: var(--font-integral);
+      font-family: v.$font-heading;
       font-size: 64px;
       line-height: 1.1;
       font-weight: 900;
@@ -33,7 +33,7 @@
     }
 
     .description {
-      font-family: var(--font-satoshi);
+      font-family: v.$font-body;
       font-size: 16px;
       line-height: 1.5;
       color: rgba(0, 0, 0, 0.6);
@@ -66,13 +66,13 @@
 
     .statItem {
       h3 {
-        font-family: var(--font-satoshi);
+        font-family: v.$font-body;
         font-size: 40px;
         font-weight: 700;
         margin: 0;
       }
       p {
-        font-family: var(--font-satoshi);
+        font-family: v.$font-body;
         font-size: 16px;
         color: rgba(0, 0, 0, 0.6);
         margin: 0;
