@@ -229,19 +229,78 @@
 
       .brandList {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
         justify-items: center;
 
         img {
           height: 22px;
-          max-width: 100%;
+          max-width: 80%;
+          object-fit: contain;
         }
-        
-        img:nth-child(4), img:nth-child(5) {
-          grid-column: span 1.5;
-          transform: translateX(50%);
-        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    .container {
+      padding: 0 12px;
+    }
+
+    .content {
+      padding-top: 24px;
+      padding-bottom: 24px;
+
+      .title {
+        font-size: 28px;
+        margin-bottom: 16px;
+      }
+
+      .description {
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+
+      .shopBtn {
+        padding: 14px 0;
+        margin-bottom: 32px;
+      }
+    }
+
+    .stats .statItem {
+      h3 {
+        font-size: 20px;
+      }
+      p {
+        font-size: 11px;
+      }
+    }
+
+    .imageWrapper {
+      margin: 0 -12px;
+
+      .imageBox {
+        height: 300px;
+      }
+
+      .starLarge {
+        width: 56px;
+        right: 12px;
+      }
+
+      .starSmall {
+        width: 32px;
+        left: 12px;
+      }
+    }
+
+    .brandBar {
+      padding: 24px 12px;
+
+      .brandList img {
+        height: 18px;
       }
     }
   }
