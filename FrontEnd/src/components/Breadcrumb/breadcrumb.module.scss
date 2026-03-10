@@ -33,6 +33,19 @@
     }
   }
 
+  @media (max-width: 480px) {
+    padding-left: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin: 12px 0;
+    font-size: 13px;
+
+    &::before {
+      left: 12px;
+      right: 12px;
+    }
+  }
+
   a {
     text-decoration: none;
     color: inherit;
