@@ -11,63 +11,113 @@
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 100px;
+  }
 
-    .sidebar {
-      // position: static;
-      max-height: fit-content;
-    }
+  @media (max-width: 480px) {
+    padding-left: 12px;
+    padding-right: 12px;
+    margin-bottom: 80px;
+    gap: 16px;
   }
 }
 
 .mainContent {
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
+  min-width: 0;
+}
 
-    h2 {
-      font-family: v.$font-heading;
-      font-size: 32px;
-    }
-    .meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 16px;
-      padding-left: 10px;
-      color: rgba(0, 0, 0, 0.6);
-      strong {
-        color: #000;
-      }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  margin-bottom: 20px;
+
+  h2 {
+    font-family: v.$font-heading;
+    font-size: 32px;
+    margin: 0;
+    flex: 1 1 100%;
+
+    @media (min-width: 480px) {
+      flex: 1 1 auto;
     }
 
-    .mobileFilterBtn {
-      display: none;
-      @media (max-width: 1024px) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        background: #f0f0f0;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-      }
+    @media (max-width: 480px) {
+      font-size: 24px;
     }
   }
 
-  .productGrid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-      padding: 0 10px;
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.6);
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) {
+      font-size: 13px;
+      gap: 8px;
+
+      span:first-child {
+        width: 100%;
+        order: -1;
+      }
     }
+
+    strong {
+      color: #000;
+    }
+  }
+
+  .mobileFilterBtn {
+    display: none;
+
+    @media (max-width: 1024px) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      background: #f0f0f0;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+
+      &:hover {
+        background: #e0e0e0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+    }
+  }
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 12px;
   }
 }
 
@@ -75,31 +125,68 @@
   height: 1px;
   background-color: rgba(0, 0, 0, 0.1);
   margin: 32px 0;
+
+  @media (max-width: 480px) {
+    margin: 24px 0;
+  }
 }
 
 .pagination {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    justify-content: center;
+  }
+
   .navBtn {
     padding: 8px 16px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     background: #fff;
     font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
+
+    @media (max-width: 480px) {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
   }
+
   .pages {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    @media (max-width: 480px) {
+      gap: 4px;
+    }
+
     button {
       width: 40px;
       height: 40px;
+      min-width: 36px;
+      min-height: 36px;
       border-radius: 8px;
       border: none;
       background: transparent;
       cursor: pointer;
+      font-size: 14px;
+
+      @media (max-width: 480px) {
+        width: 36px;
+        height: 36px;
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 13px;
+      }
+
       &.activePage {
         background-color: rgba(0, 0, 0, 0.06);
       }

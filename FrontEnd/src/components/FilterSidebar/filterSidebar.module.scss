@@ -39,8 +39,9 @@
     position: fixed;
     top: 0;
     right: 0;
-    bottom: 0; 
-    max-width: 60%;
+    bottom: 0;
+    width: min(320px, 90%);
+    max-width: min(320px, 90%);
     max-height: 95%;
     
     border: none; 
@@ -209,9 +210,19 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
+
   .colorCircle {
     width: 37px;
     height: 37px;
+
+    @media (max-width: 480px) {
+      width: 32px;
+      height: 32px;
+    }
     border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;

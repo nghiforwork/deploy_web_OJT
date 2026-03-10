@@ -5,6 +5,10 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   width: 100%;
 
+  @media (max-width: 480px) {
+    padding: 48px 0;
+  }
+
   &.noBorder {
     border-bottom: none;
   }
@@ -13,6 +17,10 @@
     max-width: 1340px;
     margin: 0 auto;
     padding: 0 16px;
+
+    @media (max-width: 480px) {
+      padding: 0 12px;
+    }
   }
 
   .title {
@@ -25,6 +33,11 @@
     @media (max-width: 768px) {
       font-size: 32px;
       margin-bottom: 32px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 26px;
+      margin-bottom: 24px;
     }
   }
 
@@ -42,8 +55,13 @@
       overflow-x: auto;
       padding-bottom: 20px;
       gap: 16px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+
       & > * {
-        min-width: 200px;
+        min-width: min(200px, 70vw);
+        flex-shrink: 0;
+        scroll-snap-align: start;
       }
     }
   }

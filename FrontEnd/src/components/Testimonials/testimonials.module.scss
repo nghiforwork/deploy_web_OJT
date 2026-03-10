@@ -4,12 +4,25 @@
   padding: 40px 0;
   overflow: hidden;
 
+  @media (max-width: 480px) {
+    padding: 32px 0;
+  }
+
   .header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 40px;
     padding: 0 40px;
+
+    @media (max-width: 768px) {
+      padding: 0 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 0 12px;
+      margin-bottom: 24px;
+    }
 
     .title {
       font-family: v.$font-heading;
@@ -63,7 +76,17 @@
   padding: 20px 10%;
   scrollbar-width: none;
   cursor: grab;
-  user-select: none; 
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 768px) {
+    padding: 16px 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px 12px;
+    gap: 16px;
+  }
 
   &::-webkit-scrollbar {
     display: none;
@@ -131,18 +154,27 @@
 
 // Responsive
 @media (max-width: 768px) {
-  .testimonialSection {
-    padding: 40px 0;
+  .testimonialSection .header .title {
+    font-size: 32px;
+  }
+}
 
-    .header {
-      .title {
-        font-size: 32px;
-      }
-    }
+@media (max-width: 480px) {
+  .testimonialSection .header .title {
+    font-size: 24px;
   }
 
   .card {
-    flex: 0 0 310px;
-    padding: 24px;
+    flex: 0 0 280px;
+    padding: 20px;
+
+    .userInfo .name {
+      font-size: 16px;
+    }
+
+    .content {
+      font-size: 14px;
+      -webkit-line-clamp: 4;
+    }
   }
 }

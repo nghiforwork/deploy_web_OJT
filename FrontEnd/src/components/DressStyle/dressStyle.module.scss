@@ -3,6 +3,10 @@
 .section {
   padding: 0 16px 72px;
 
+  @media (max-width: 480px) {
+    padding: 0 12px 48px;
+  }
+
   .container {
     max-width: 1240px;
     margin: 0 auto;
@@ -13,6 +17,11 @@
     @media (max-width: 768px) {
       padding: 40px 24px;
       border-radius: 20px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 28px 16px;
+      border-radius: 16px;
     }
   }
 
@@ -27,6 +36,11 @@
       font-size: 32px;
       margin-bottom: 28px;
     }
+
+    @media (max-width: 480px) {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
   }
 
   .grid {
@@ -37,6 +51,10 @@
     @media (max-width: 1024px) {
       display: flex;
       flex-direction: column;
+    }
+
+    @media (max-width: 480px) {
+      gap: 12px;
     }
   }
 
@@ -77,6 +95,17 @@
         font-size: 24px;
         left: 24px;
         top: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      height: 140px;
+      border-radius: 12px;
+
+      .cardTitle {
+        font-size: 18px;
+        left: 16px;
+        top: 12px;
       }
     }
   }
