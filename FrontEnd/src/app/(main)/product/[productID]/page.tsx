@@ -17,7 +17,7 @@ const PRODUCT_IMAGES = [
 
 const MOCK_PRODUCT = {
   id: 1,
-  name: "ONE LIFE GRAPHIC T-SHIRT",
+  name: "ONE LIFE GRAPHIC TSHIRT",
   image: PRODUCT_IMAGES[0],
   images: PRODUCT_IMAGES,
   rating: 4.5,
