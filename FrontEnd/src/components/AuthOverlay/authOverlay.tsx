@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { X } from "lucide-react";
@@ -12,6 +13,15 @@ function AuthOverlayInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const auth = searchParams.get("auth");
+
+  useEffect(() => {
+    if (auth === "login" || auth === "signup") {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [auth]);
 
   const close = () => router.push(pathname);
 
