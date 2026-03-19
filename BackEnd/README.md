@@ -9,14 +9,14 @@ Run the following command to create and activate a virtual environment.
 #### On Linux/MacOS
 
 ```sh
-python -m venv venv
+python -m venv .venv
 source .venv/bin/activate
 ```
 
 #### On Windows
 
 ```sh
-python -m venv venv
+python -m venv .venv
 .venv\Scripts\activate
 ```
 
