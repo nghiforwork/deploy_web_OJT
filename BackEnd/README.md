@@ -34,7 +34,7 @@ python -m pip install -r requirements.txt
 
 #### Setup environment
 
-Copy `.env.example` to `.env` and edit it to suit your needs.
+Copy `.env.example` to `.env` and edit it to suit your needs. or Edit DATABASE in core/settings.py
 
 #### Migrate database
 
