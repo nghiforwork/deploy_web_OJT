@@ -42,7 +42,7 @@ Copy `.env.example` to `.env` and edit it to suit your needs.
 python manage.py migrate
 ```
 
-**NOTE** If errors happen, check your database connection environment variables.
+**NOTE** If errors happen, check your database connection environment variables. (If no database, please create new one)
 
 #### Run the server
 
