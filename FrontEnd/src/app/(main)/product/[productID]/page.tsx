@@ -6,7 +6,7 @@ import Image from "next/image";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
 import ProductCard from "@/components/ProductCard/productCard";
-import { Product } from "@/types/product";
+import type { CatalogProduct } from "@/types/catalog";
 import styles from "./page.module.scss";
 
 const PRODUCT_IMAGES = [
@@ -43,11 +43,43 @@ const MOCK_REVIEWS = [
   { id: 6, name: "Michael P.", rating: 5, text: "Excellent product. Would recommend to anyone looking for a quality graphic tee.", date: "August 3, 2023", verified: true },
 ];
 
-const RELATED_PRODUCTS: Product[] = [
-  { id: 2, name: "Polo with Contrast Trims", image: "/images/Image product/image 7.png", rating: 4.5, price: 212, originalPrice: 232, discountLabel: "-20%" },
-  { id: 3, name: "Black Striped T-shirt", image: "/images/Image product/image 8.png", rating: 5.0, price: 120, originalPrice: 160, discountLabel: "-30%" },
-  { id: 4, name: "Gradient Graphic T-shirt", image: "/images/Image product/image 9.png", rating: 4.0, price: 145 },
-  { id: 5, name: "Checkered Shirt", image: "/images/Image product/image 10.png", rating: 4.5, price: 180 },
+const RELATED_PRODUCTS: CatalogProduct[] = [
+  {
+    id: 2,
+    name: "Polo with Contrast Trims",
+    slug: "polo-with-contrast-trims",
+    image_url: "/images/Image product/image 7.png",
+    rating: 4.5,
+    price: 212,
+    original_price: 232,
+    discount_label: "-20%",
+  },
+  {
+    id: 3,
+    name: "Black Striped T-shirt",
+    slug: "black-striped-t-shirt",
+    image_url: "/images/Image product/image 8.png",
+    rating: 5.0,
+    price: 120,
+    original_price: 160,
+    discount_label: "-30%",
+  },
+  {
+    id: 4,
+    name: "Gradient Graphic T-shirt",
+    slug: "gradient-graphic-t-shirt",
+    image_url: "/images/Image product/image 9.png",
+    rating: 4.0,
+    price: 145,
+  },
+  {
+    id: 5,
+    name: "Checkered Shirt",
+    slug: "checkered-shirt",
+    image_url: "/images/Image product/image 10.png",
+    rating: 4.5,
+    price: 180,
+  },
 ];
 
 type TabId = "details" | "reviews" | "faq";

@@ -1,119 +1,394 @@
-"use client"
-import React, { useState, use } from "react";
+"use client";
+import React, {
+  Suspense,
+  useState,
+  use,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
 import ProductCard from "@/components/ProductCard/productCard";
-import FilterSidebar from "@/components/FilterSidebar/filterSidebar";
+import FilterSidebar, {
+  PRICE_SLIDER_MAX,
+  getDressStyleLabel,
+} from "@/components/FilterSidebar/filterSidebar";
 import Breadcrumb from "@/components/Breadcrumb/breadcrumb";
-import { Product } from "@/types/product";
+import type { CatalogProduct } from "@/types/catalog";
 import styles from "./category.module.scss";
 import SortDropdown from "@/components/SortDropdown/sortDropdown";
 import { SlidersHorizontal } from "lucide-react";
+import { fetchCatalogProducts } from "@/services/catalog.service";
 
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: 1,
-    name: "Gradient Graphic T-shirt",
-    price: 145,
-    rating: 3.5,
-    image: "/images/products/black-orange-tshirt.png",
-  },
-  {
-    id: 2,
-    name: "Polo with Tipping Details",
-    price: 180,
-    rating: 4.5,
-    image: "/images/products/green-shirt.png",
-  },
-  {
-    id: 3,
-    name: "Black Striped T-shirt",
-    price: 120,
-    rating: 5.0,
-    image: "/images/products/black-tshirt.png",
-    originalPrice: 160,
-    discountLabel: "-30%",
-  },
-  {
-    id: 4,
-    name: "Skinny Fit Jeans",
-    price: 240,
-    rating: 4.5,
-    image: "/images/products/blue-jeans.png",
-    originalPrice: 160,
-    discountLabel: "-20%",
-  },
-  {
-    id: 5,
-    name: "Checkered Shirt",
-    price: 180,
-    rating: 4.5,
-    image: "/images/products/purple-shirt.png",
-  },
-  {
-    id: 6,
-    name: "Sleeve Striped T-shirt",
-    price: 130,
-    rating: 4.5,
-    image: "/images/products/orange-tshirt.png",
-    originalPrice: 160,
-    discountLabel: "-30%",
-  },
-  {
-    id: 7,
-    name: "Vertical Striped Shirt",
-    price: 212,
-    rating: 5.0,
-    image: "/images/products/green-shirt.png",
-    originalPrice: 160,
-    discountLabel: "-20%",
-  },
-  {
-    id: 8,
-    name: "Courage Graphic T-shirt",
-    price: 145,
-    rating: 4.0,
-    image: "/images/products/black-orange-tshirt.png",
-  },
-  {
-    id: 9,
-    name: "Loose Fit Bermuda Shorts",
-    price: 80,
-    rating: 3.0,
-    image: "/images/products/blue-short.png",
-  },
-];
+const PAGE_SIZE = 9;
 
-export default function CategoryPage({
+const SORT_ORDERING_BY_LABEL: Record<string, string> = {
+  "Most Popular": "-stock",
+  Newest: "-created_at",
+  "Price: Low → High": "price",
+  "Price: High → Low": "-price",
+  "Top Rated": "-rating",
+};
+
+function formatCategoryTitle(categoryID: string): string {
+  const id = categoryID.toLowerCase();
+  if (id === "all") return "All products";
+  return categoryID
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function normalizeRouteCategorySlug(categoryID: string): string {
+  const id = categoryID.toLowerCase();
+  return id === "all" ? "all" : id;
+}
+
+type DraftFilters = {
+  categorySlug: string;
+  dressStyle: string | null;
+  color: string | null;
+  size: string | null;
+  priceMin: number;
+  priceMax: number;
+};
+
+/** Đọc bộ lọc đã áp từ URL (nguồn sự thật cho API / breadcrumb). */
+function parseFiltersFromSearchParams(sp: URLSearchParams): {
+  dressStyle: string | null;
+  color: string | null;
+  size: string | null;
+  priceMin: number;
+  priceMax: number;
+} {
+  const ds = sp.get("dress_style");
+  const dressStyle = ds && ds.length > 0 ? ds : null;
+  const colorRaw = sp.get("color");
+  const color = colorRaw && colorRaw.length > 0 ? colorRaw : null;
+  const sizeRaw = sp.get("size");
+  const size = sizeRaw && sizeRaw.length > 0 ? sizeRaw : null;
+
+  let priceMin = 0;
+  let priceMax = PRICE_SLIDER_MAX;
+  const minStr = sp.get("min_price");
+  const maxStr = sp.get("max_price");
+  if (minStr !== null && minStr !== "") {
+    const n = Number(minStr);
+    if (!Number.isNaN(n)) priceMin = n;
+  }
+  if (maxStr !== null && maxStr !== "") {
+    const n = Number(maxStr);
+    if (!Number.isNaN(n)) priceMax = n;
+  }
+
+  return { dressStyle, color, size, priceMin, priceMax };
+}
+
+function buildCatalogQueryString(
+  f: Omit<DraftFilters, "categorySlug">,
+): string {
+  const p = new URLSearchParams();
+  if (f.dressStyle) p.set("dress_style", f.dressStyle);
+  if (f.color) p.set("color", f.color);
+  if (f.size) p.set("size", f.size);
+  p.set("min_price", String(f.priceMin));
+  p.set("max_price", String(f.priceMax));
+  return p.toString();
+}
+
+function CategoryPageSuspenseFallback() {
+  return (
+    <>
+      <Navigation />
+      <main className="layout">
+        <p style={{ padding: 24 }}>Loading…</p>
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+function CategoryPageContent({
   params,
 }: {
   params: Promise<{ categoryID: string }>;
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { categoryID } = use(params);
-  const categoryName = categoryID.charAt(0).toUpperCase() + categoryID.slice(1);
+  const categoryName = formatCategoryTitle(categoryID);
+  const categorySlugForApi =
+    categoryID.toLowerCase() === "all" ? null : categoryID.toLowerCase();
+
+  const filterKey = searchParams.toString();
+  const appliedFilters = useMemo(
+    () => parseFiltersFromSearchParams(searchParams),
+    [filterKey],
+  );
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [sortLabel, setSortLabel] = useState<string>(() => {
+    const sortParam = searchParams.get("sort");
+    if (
+      sortParam &&
+      Object.prototype.hasOwnProperty.call(SORT_ORDERING_BY_LABEL, sortParam)
+    ) {
+      return sortParam;
+    }
+    return "Most Popular";
+  });
+
+  const [draftCategorySlug, setDraftCategorySlug] = useState(() =>
+    normalizeRouteCategorySlug(categoryID),
+  );
+  const [draftDressStyle, setDraftDressStyle] = useState<string | null>(null);
+  const [draftColor, setDraftColor] = useState<string | null>(null);
+  const [draftSize, setDraftSize] = useState<string | null>(null);
+  const [draftPriceMin, setDraftPriceMin] = useState(0);
+  const [draftPriceMax, setDraftPriceMax] = useState(PRICE_SLIDER_MAX);
+
+  const draftFiltersRef = useRef<DraftFilters>({
+    categorySlug: normalizeRouteCategorySlug(categoryID),
+    dressStyle: null,
+    color: null,
+    size: null,
+    priceMin: 0,
+    priceMax: PRICE_SLIDER_MAX,
+  });
+
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  function revertDraftToApplied() {
+    const nextCategorySlug = normalizeRouteCategorySlug(categoryID);
+    const f = parseFiltersFromSearchParams(searchParams);
+    setDraftCategorySlug(nextCategorySlug);
+    setDraftDressStyle(f.dressStyle);
+    setDraftColor(f.color);
+    setDraftSize(f.size);
+    setDraftPriceMin(f.priceMin);
+    setDraftPriceMax(f.priceMax);
+    draftFiltersRef.current = {
+      categorySlug: nextCategorySlug,
+      dressStyle: f.dressStyle,
+      color: f.color,
+      size: f.size,
+      priceMin: f.priceMin,
+      priceMax: f.priceMax,
+    };
+  }
+
+  function handleSidebarClose() {
+    revertDraftToApplied();
+    setIsFilterOpen(false);
+  }
+
+  function handleApplyFilters() {
+    const {
+      categorySlug,
+      dressStyle,
+      color,
+      size,
+      priceMin,
+      priceMax,
+    } = draftFiltersRef.current;
+    const currentSlug = normalizeRouteCategorySlug(categoryID);
+    const q = buildCatalogQueryString({
+      dressStyle,
+      color,
+      size,
+      priceMin,
+      priceMax,
+    });
+    const path = `/category/${categorySlug}`;
+    const href = q ? `${path}?${q}` : path;
+
+    if (categorySlug !== currentSlug) {
+      router.push(href);
+    } else {
+      router.replace(href);
+    }
+    setPage(1);
+    setIsFilterOpen(false);
+  }
+
+  function handleDraftCategoryChange(slug: string) {
+    setDraftCategorySlug(slug);
+    draftFiltersRef.current.categorySlug = slug;
+  }
+
+  function handleDraftDressStyleChange(slug: string | null) {
+    setDraftDressStyle(slug);
+    draftFiltersRef.current.dressStyle = slug;
+  }
+
+  function handleDraftColorChange(color: string | null) {
+    setDraftColor(color);
+    draftFiltersRef.current.color = color;
+  }
+
+  function handleDraftSizeChange(size: string | null) {
+    setDraftSize(size);
+    draftFiltersRef.current.size = size;
+  }
+
+  function handleDraftPriceChange(min: number, max: number) {
+    setDraftPriceMin(min);
+    setDraftPriceMax(max);
+    draftFiltersRef.current.priceMin = min;
+    draftFiltersRef.current.priceMax = max;
+  }
+
+  useEffect(() => {
+    const slug = normalizeRouteCategorySlug(categoryID);
+    const f = parseFiltersFromSearchParams(searchParams);
+    setDraftCategorySlug(slug);
+    setDraftDressStyle(f.dressStyle);
+    setDraftColor(f.color);
+    setDraftSize(f.size);
+    setDraftPriceMin(f.priceMin);
+    setDraftPriceMax(f.priceMax);
+
+    // Cập nhật sort từ query (?sort=Newest, ?sort=Most%20Popular, ...)
+    // để "View All" trên Home giữ đúng thứ tự.
+    const sortParam = searchParams.get("sort");
+    if (
+      sortParam &&
+      Object.prototype.hasOwnProperty.call(SORT_ORDERING_BY_LABEL, sortParam)
+    ) {
+      setSortLabel(sortParam);
+    } else {
+      setSortLabel("Most Popular");
+    }
+
+    draftFiltersRef.current = {
+      categorySlug: slug,
+      dressStyle: f.dressStyle,
+      color: f.color,
+      size: f.size,
+      priceMin: f.priceMin,
+      priceMax: f.priceMax,
+    };
+  }, [categoryID, filterKey]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [categoryID, filterKey]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+      try {
+        const { count, results } = await fetchCatalogProducts({
+          page,
+          pageSize: PAGE_SIZE,
+          categorySlug: categorySlugForApi,
+          dressStyleSlug: appliedFilters.dressStyle,
+          minPrice: appliedFilters.priceMin,
+          maxPrice: appliedFilters.priceMax,
+          color: appliedFilters.color,
+          size: appliedFilters.size,
+          ordering: SORT_ORDERING_BY_LABEL[sortLabel] ?? "-created_at",
+        });
+        if (!cancelled) {
+          setProducts(results);
+          setTotalCount(count);
+        }
+      } catch {
+        if (!cancelled) {
+          setError(
+            "Unable to load products. Check that the API is running and NEXT_PUBLIC_API matches your Django server (e.g. http://127.0.0.1:8000/).",
+          );
+          setProducts([]);
+          setTotalCount(0);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    categoryID,
+    page,
+    categorySlugForApi,
+    appliedFilters,
+    sortLabel,
+  ]);
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+  const rangeStart = totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, totalCount);
+
+  const appliedDressStyleLabel = appliedFilters.dressStyle
+    ? getDressStyleLabel(appliedFilters.dressStyle) ??
+      formatCategoryTitle(appliedFilters.dressStyle)
+    : null;
+  const pageHeading = appliedDressStyleLabel
+    ? `${appliedDressStyleLabel} · ${categoryName}`
+    : categoryName;
+
+  useEffect(() => {
+    document.title = `${pageHeading} | SHOP.CO`;
+  }, [pageHeading]);
 
   return (
     <>
       <Navigation />
       <main className="layout">
-        <Breadcrumb category={categoryName} />
+        <Breadcrumb
+          dressStyleSegment={appliedDressStyleLabel}
+          category={categoryName}
+        />
 
         <div className={styles.categoryLayout}>
-          <FilterSidebar 
-            isOpen={isFilterOpen} 
-            onClose={() => setIsFilterOpen(false)} 
+          <FilterSidebar
+            isOpen={isFilterOpen}
+            onClose={handleSidebarClose}
+            draftCategorySlug={draftCategorySlug}
+            onDraftCategoryChange={handleDraftCategoryChange}
+            dressStyleSlug={draftDressStyle}
+            onDressStyleChange={handleDraftDressStyleChange}
+            priceMin={draftPriceMin}
+            priceMax={draftPriceMax}
+            onPriceChange={handleDraftPriceChange}
+            selectedColor={draftColor}
+            selectedSize={draftSize}
+            onColorChange={handleDraftColorChange}
+            onSizeChange={handleDraftSizeChange}
+            onApplyFilters={handleApplyFilters}
           />
 
           <div className={styles.mainContent}>
             <div className={styles.toolbar}>
-              <h2>{categoryName}</h2>
+              <h2>{pageHeading}</h2>
               <div className={styles.meta}>
-                <span>Showing 1-9 of 100 Products</span>
-                <SortDropdown />
+                <span>
+                  {loading
+                    ? "Loading…"
+                    : `Showing ${rangeStart}-${rangeEnd} of ${totalCount} Products`}
+                </span>
+                <SortDropdown
+                  value={sortLabel}
+                  onChange={(next) => {
+                    setSortLabel(next);
+                    setPage(1);
+                  }}
+                />
 
-                <button 
+                <button
+                  type="button"
                   className={styles.mobileFilterBtn}
                   onClick={() => setIsFilterOpen(true)}
                 >
@@ -122,29 +397,70 @@ export default function CategoryPage({
               </div>
             </div>
 
+            {error && (
+              <p className={styles.meta} style={{ color: "#b42318", marginBottom: 16 }}>
+                {error}
+              </p>
+            )}
+
             <div className={styles.productGrid}>
-              {MOCK_PRODUCTS.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+              {loading && (
+                <p className={styles.meta} style={{ gridColumn: "1 / -1" }}>
+                  Loading products…
+                </p>
+              )}
+              {!loading &&
+                products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              {!loading && !error && products.length === 0 && (
+                <p className={styles.meta} style={{ gridColumn: "1 / -1" }}>
+                  No products found.
+                </p>
+              )}
             </div>
 
             <div className={styles.divider} />
 
             <div className={styles.pagination}>
-              <button className={styles.navBtn}>Previous</button>
+              <button
+                type="button"
+                className={styles.navBtn}
+                disabled={loading || page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </button>
               <div className={styles.pages}>
-                <button className={styles.activePage}>1</button>
-                <button>2</button>
-                <button>3</button>
-                <span>...</span>
-                <button>10</button>
+                <span style={{ padding: "0 8px", fontSize: 14 }}>
+                  Page {page} of {totalPages}
+                </span>
               </div>
-              <button className={styles.navBtn}>Next</button>
+              <button
+                type="button"
+                className={styles.navBtn}
+                disabled={loading || page >= totalPages || totalCount === 0}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function CategoryPage({
+  params,
+}: {
+  params: Promise<{ categoryID: string }>;
+}) {
+  return (
+    <Suspense fallback={<CategoryPageSuspenseFallback />}>
+      <CategoryPageContent params={params} />
+    </Suspense>
   );
 }

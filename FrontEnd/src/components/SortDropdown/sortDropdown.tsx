@@ -11,9 +11,13 @@ const SORT_OPTIONS = [
   "Top Rated",
 ];
 
-const SortDropdown = () => {
+type SortDropdownProps = {
+  value: string;
+  onChange: (nextValue: string) => void;
+};
+
+const SortDropdown = ({ value, onChange }: SortDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState("Most Popular");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Đóng menu khi click ra ngoài
@@ -31,7 +35,7 @@ const SortDropdown = () => {
     <div className={styles.sortContainer} ref={dropdownRef}>
       <div className={styles.trigger} onClick={() => setIsOpen(!isOpen)}>
         <span>Sort by: </span>
-        <strong>{selected}</strong>
+        <strong>{value}</strong>
         <ChevronDown 
           size={16} 
           className={`${styles.icon} ${isOpen ? styles.rotated : ""}`} 
@@ -43,9 +47,9 @@ const SortDropdown = () => {
           {SORT_OPTIONS.map((option) => (
             <li 
               key={option} 
-              className={selected === option ? styles.active : ""}
+              className={value === option ? styles.active : ""}
               onClick={() => {
-                setSelected(option);
+                onChange(option);
                 setIsOpen(false);
               }}
             >

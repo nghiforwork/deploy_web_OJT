@@ -42,6 +42,9 @@
     }
 
     .shopBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background-color: #000;
       color: #fff;
       padding: 16px 68px;
@@ -52,6 +55,7 @@
       cursor: pointer;
       margin-bottom: 48px;
       transition: all 0.3s ease;
+      text-decoration: none;
 
       &:hover {
         background-color: rgba(110, 106, 106, 0.8);

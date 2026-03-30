@@ -2,15 +2,21 @@
 import Link from 'next/link';
 import ProductCard from '../ProductCard/productCard';
 import styles from './productSection.module.scss';
-import { Product } from '@/types/product';
+import type { CatalogProduct } from "@/types/catalog";
 
 interface ProductSectionProps {
   title: string;
-  products: Product[];
+  products: CatalogProduct[];
   hideBorder?: boolean;
+  viewAllHref?: string;
 }
 
-export default function ProductSection({ title, products, hideBorder }: ProductSectionProps) {
+export default function ProductSection({
+  title,
+  products,
+  hideBorder,
+  viewAllHref,
+}: ProductSectionProps) {
   return (
     <section className={`${styles.section} ${hideBorder ? styles.noBorder : ''}`}>
       <div className={styles.container}>
@@ -22,7 +28,15 @@ export default function ProductSection({ title, products, hideBorder }: ProductS
             </Link>
           ))}
         </div>
-        <button className={styles.viewAllBtn}>View All</button>
+        {viewAllHref ? (
+          <Link href={viewAllHref} className={styles.viewAllBtn}>
+            View All
+          </Link>
+        ) : (
+          <button type="button" className={styles.viewAllBtn}>
+            View All
+          </button>
+        )}
       </div>
     </section>
   );
