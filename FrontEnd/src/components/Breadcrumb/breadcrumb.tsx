@@ -4,11 +4,24 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import styles from './breadcrumb.module.scss';
 
-const Breadcrumb = ({ category }: { category: string }) => {
+const Breadcrumb = ({
+  dressStyleSegment,
+  category,
+}: {
+  /** Nhãn cấp Dress Style khi có chọn style; không có thì ẩn cấp này. */
+  dressStyleSegment?: string | null;
+  category: string;
+}) => {
   return (
-    <nav className={styles.breadcrumb}>
+    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
       <Link href="/">Home</Link>
-      <ChevronRight size={16} />
+      {dressStyleSegment && (
+        <>
+          <ChevronRight size={16} aria-hidden />
+          <span>{dressStyleSegment}</span>
+        </>
+      )}
+      <ChevronRight size={16} aria-hidden />
       <span>{category}</span>
     </nav>
   );

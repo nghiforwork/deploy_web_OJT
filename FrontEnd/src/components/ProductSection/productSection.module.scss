@@ -82,11 +82,13 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 62px;
     background: #fff;
+    color: #000;
     font-family: v.$font-body;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    text-decoration: none;
 
     &:hover {
       background: #000;

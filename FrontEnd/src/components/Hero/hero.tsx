@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./hero.module.scss";
 
 export default function Hero() {
@@ -17,7 +18,9 @@ export default function Hero() {
               of style.
             </p>
 
-            <button className={styles.shopBtn}>Shop Now</button>
+            <Link href="/category/all" className={styles.shopBtn}>
+              Shop Now
+            </Link>
 
             <div className={styles.stats}>
               <div className={styles.statItem}>

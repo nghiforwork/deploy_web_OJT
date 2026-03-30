@@ -1,88 +1,58 @@
 import DressStyle from "@/components/DressStyle/dressStyle";
 import Footer from "@/components/Footer/footer";
-
 import Hero from "@/components/Hero/hero";
 import Navigation from "@/components/Navigation/navigation";
 import ProductSection from "@/components/ProductSection/productSection";
-import TestimonialSection from "@/components/Testimonials/testimonialSection";
+import TestimonialSection from "@/components/Testimonials/TestimonialSection";
+import { fetchCatalogProducts } from "@/services/catalog.service";
 
-import { Product } from "@/types/product";
+import type { CatalogProduct } from "@/types/catalog";
 
-export default function Home() {
-  const newArrivals: Product[] = [
-    {
-      id: 1,
-      name: "T-shirt with Tape Details",
-      image: "/images/products/black-tshirt.png",
-      rating: 4.5,
-      price: 120,
-    },
-    {
-      id: 2,
-      name: "Skinny Fit Jeans",
-      image: "/images/products/blue-jeans.png",
-      rating: 3.5,
-      price: 240,
-      originalPrice: 260,
-      discountLabel: "-20%",
-    },
-    {
-      id: 3,
-      name: "Checkered Shirt",
-      image: "/images/products/purple-shirt.png",
-      rating: 4.5,
-      price: 180,
-    },
-    {
-      id: 4,
-      name: "Sleeve Striped T-shirt",
-      image: "/images/products/black-orange-tshirt.png",
-      rating: 4.5,
-      price: 130,
-      originalPrice: 160,
-      discountLabel: "-30%",
-    },
-  ];
+export default async function Home() {
+  const pageSize = 4;
 
-  const topSelling: Product[] = [
-    {
-      id: 5,
-      name: "Vertical Striped Shirt",
-      image: "/images/products/green-shirt.png",
-      rating: 5.0,
-      price: 212,
-      originalPrice: 232,
-      discountLabel: "-20%",
-    },
-    {
-      id: 6,
-      name: "Courage Graphic T-shirt",
-      image: "/images/products/orange-tshirt.png",
-      rating: 4.0,
-      price: 145,
-    },
-    {
-      id: 7,
-      name: "Loose Fit Bermuda Shorts",
-      image: "/images/products/blue-short.png",
-      rating: 3.0,
-      price: 80,
-    },
-    {
-      id: 8,
-      name: "Faded Skinny Jeans",
-      image: "/images/products/black-jeans.png",
-      rating: 4.5,
-      price: 210,
-    },
-  ];
+  // NEW ARRIVALS: lấy sản phẩm mới nhất theo created_at.
+  // TOP SELLING: hiện tại backend đang hỗ trợ ordering theo stock (Most Popular = -stock).
+  let newArrivals: CatalogProduct[] = [];
+  let topSelling: CatalogProduct[] = [];
+
+  try {
+    const [newArrivalsRes, topSellingRes] = await Promise.all([
+      fetchCatalogProducts({
+        page: 1,
+        pageSize,
+        ordering: "-created_at",
+      }),
+      fetchCatalogProducts({
+        page: 1,
+        pageSize,
+        ordering: "-stock",
+      }),
+    ]);
+
+    newArrivals = newArrivalsRes.results;
+    topSelling = topSellingRes.results;
+  } catch {
+    // Nếu API lỗi/không chạy, vẫn render layout trang với danh sách rỗng.
+    newArrivals = [];
+    topSelling = [];
+  }
 
   return (
     <main>
       <Navigation />
       <Hero />
-      <ProductSection title="NEW ARRIVALS" products={newArrivals} />
-      <ProductSection title="TOP SELLING" products={topSelling} hideBorder />
+      <ProductSection
+        title="NEW ARRIVALS"
+        products={newArrivals}
+        viewAllHref="/category/all?sort=Newest"
+      />
+      <ProductSection
+        title="TOP SELLING"
+        products={topSelling}
+        hideBorder
+        viewAllHref="/category/all?sort=Most%20Popular"
+      />
       <DressStyle />
       <TestimonialSection />
       <Footer />

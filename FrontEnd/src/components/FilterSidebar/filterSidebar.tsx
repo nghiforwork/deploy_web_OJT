@@ -1,33 +1,103 @@
 "use client";
-import React, { useState } from "react";
-import { SlidersHorizontal, ChevronRight, Check, X } from "lucide-react"; // Thêm icon X
+import React from "react";
+import { SlidersHorizontal, ChevronRight, Check, X } from "lucide-react";
 import styles from "./filterSidebar.module.scss";
 
-const CATEGORIES = ["T-shirts", "Shorts", "Shirts", "Hoodie", "Jeans"];
 const COLORS = ["#00C129", "#F50606", "#F5DD06", "#F57906", "#06CAF5", "#063AF5", "#7D06F5", "#F506A4", "#FFFFFF", "#000000"];
 const SIZES = ["XX-Small", "X-Small", "Small", "Medium", "Large", "X-Large", "XX-Large", "3X-Large", "4X-Large"];
-const DRESS_STYLES = ["Casual", "Formal", "Party", "Gym"];
+
+/** Slug khớp với `Category.slug` trên API và đường dẫn `/category/[slug]`. */
+const CATEGORY_NAV: { label: string; slug: string }[] = [
+  { label: "All", slug: "all" },
+  { label: "T-shirts", slug: "t-shirts" },
+  { label: "Shorts", slug: "shorts" },
+  { label: "Shirts", slug: "shirts" },
+  { label: "Hoodie", slug: "hoodie" },
+  { label: "Jeans", slug: "jeans" },
+];
+
+const DRESS_STYLE_OPTIONS: { label: string; slug: string }[] = [
+  { label: "Casual", slug: "casual" },
+  { label: "Formal", slug: "formal" },
+  { label: "Party", slug: "party" },
+  { label: "Gym", slug: "gym" },
+];
+
+/** Nhãn hiển thị cho slug dress style (breadcrumb, tiêu đề). */
+export function getDressStyleLabel(slug: string | null): string | null {
+  if (!slug) return null;
+  const found = DRESS_STYLE_OPTIONS.find((o) => o.slug === slug);
+  return found?.label ?? null;
+}
+
+/** Trùng với trần slider giá; mặc định khoảng lọc 0…MAX (không hẹp cửa ban đầu). */
+export const PRICE_SLIDER_MAX = 500;
 
 interface FilterSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  draftCategorySlug: string;
+  onDraftCategoryChange: (slug: string) => void;
+  dressStyleSlug: string | null;
+  onDressStyleChange: (slug: string | null) => void;
+  priceMin: number;
+  priceMax: number;
+  onPriceChange: (min: number, max: number) => void;
+  selectedColor: string | null;
+  selectedSize: string | null;
+  onColorChange: (color: string | null) => void;
+  onSizeChange: (size: string | null) => void;
+  onApplyFilters: () => void;
 }
 
-const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [minPrice, setMinPrice] = useState(50);
-  const [maxPrice, setMaxPrice] = useState(200);
+const listBtnReset: React.CSSProperties = {
+  width: "100%",
+  border: "none",
+  background: "none",
+  font: "inherit",
+  textAlign: "left",
+  padding: 0,
+  cursor: "pointer",
+};
 
-  const maxLimit = 500;
-  const minPercent = (minPrice / maxLimit) * 100;
-  const maxPercent = 100 - (maxPrice / maxLimit) * 100;
+const FilterSidebar = ({
+  isOpen,
+  onClose,
+  draftCategorySlug,
+  onDraftCategoryChange,
+  dressStyleSlug,
+  onDressStyleChange,
+  priceMin,
+  priceMax,
+  onPriceChange,
+  selectedColor,
+  selectedSize,
+  onColorChange,
+  onSizeChange,
+  onApplyFilters,
+}: FilterSidebarProps) => {
+  const maxLimit = PRICE_SLIDER_MAX;
+  const minPercent = (priceMin / maxLimit) * 100;
+  const maxPercent = 100 - (priceMax / maxLimit) * 100;
+  const routeLower = draftCategorySlug.toLowerCase();
+
+  function handleMinChange(raw: number) {
+    const v = Math.max(0, Math.min(raw, maxLimit));
+    const nextMin = Math.min(v, priceMax);
+    onPriceChange(nextMin, priceMax);
+  }
+
+  function handleMaxChange(raw: number) {
+    const v = Math.max(0, Math.min(raw, maxLimit));
+    const nextMax = Math.max(v, priceMin);
+    onPriceChange(priceMin, nextMax);
+  }
 
   return (
     <>
-      <div 
-        className={`${styles.overlay} ${isOpen ? styles.showOverlay : ""}`} 
-        onClick={onClose} 
+      <div
+        className={`${styles.overlay} ${isOpen ? styles.showOverlay : ""}`}
+        onClick={onClose}
       />
 
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
@@ -39,12 +109,24 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
 
         <div className={styles.scrollContent}>
           <div className={styles.section}>
+            <h4>Categories</h4>
             <ul className={styles.list}>
-              {CATEGORIES.map((item) => (
-                <li key={item} className={styles.listItem}>
-                  {item} <ChevronRight size={16} />
-                </li>
-              ))}
+              {CATEGORY_NAV.map(({ label, slug }) => {
+                const active = routeLower === slug;
+                return (
+                  <li key={slug}>
+                    <button
+                      type="button"
+                      style={listBtnReset}
+                      className={`${styles.listItem} ${active ? styles.listItemActive : ""}`}
+                      onClick={() => onDraftCategoryChange(slug)}
+                    >
+                      <span>{label}</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -52,8 +134,8 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
             <h4>Price</h4>
             <div className={styles.priceSliderContainer}>
               <div className={styles.priceSlider}>
-                <input type="range" min={0} max={maxLimit} value={minPrice} onChange={(e) => setMinPrice(Number(e.target.value))} className={styles.rangeInput} />
-                <input type="range" min={0} max={maxLimit} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className={styles.rangeInput} />
+                <input type="range" min={0} max={maxLimit} value={priceMin} onChange={(e) => handleMinChange(Number(e.target.value))} className={styles.rangeInput} />
+                <input type="range" min={0} max={maxLimit} value={priceMax} onChange={(e) => handleMaxChange(Number(e.target.value))} className={styles.rangeInput} />
                 <div className={styles.sliderControl}>
                   <div className={styles.track}></div>
                   <div className={styles.rangeProgress} style={{ left: `${minPercent}%`, right: `${maxPercent}%` }}></div>
@@ -62,7 +144,7 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
                 </div>
               </div>
               <div className={styles.priceLabels}>
-                <span>${minPrice}</span> <span>${maxPrice}</span>
+                <span>${priceMin}</span> <span>${priceMax}</span>
               </div>
             </div>
           </div>
@@ -72,8 +154,9 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
             <div className={styles.colorsGrid}>
               {COLORS.map((color) => (
                 <button
+                  type="button"
                   key={color}
-                  onClick={() => setSelectedColor(color === selectedColor ? null : color)}
+                  onClick={() => onColorChange(color === selectedColor ? null : color)}
                   className={`${styles.colorCircle} ${color === "#FFFFFF" ? styles.white : ""}`}
                   style={{ backgroundColor: color }}
                 >
@@ -88,9 +171,10 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
             <div className={styles.sizesGrid}>
               {SIZES.map((size) => (
                 <button
+                  type="button"
                   key={size}
                   className={selectedSize === size ? styles.activeSize : ""}
-                  onClick={() => setSelectedSize(size === selectedSize ? null : size)}
+                  onClick={() => onSizeChange(size === selectedSize ? null : size)}
                 >
                   {size}
                 </button>
@@ -101,16 +185,27 @@ const FilterSidebar = ({ isOpen, onClose }: FilterSidebarProps) => {
           <div className={styles.section}>
             <h4>Dress Style</h4>
             <ul className={styles.list}>
-              {DRESS_STYLES.map((style) => (
-                <li key={style} className={styles.listItem}>
-                  {style} <ChevronRight size={16} />
-                </li>
-              ))}
+              {DRESS_STYLE_OPTIONS.map(({ label, slug }) => {
+                const active = dressStyleSlug === slug;
+                return (
+                  <li key={slug}>
+                    <button
+                      type="button"
+                      style={listBtnReset}
+                      className={`${styles.listItem} ${active ? styles.listItemActive : ""}`}
+                      onClick={() => onDressStyleChange(active ? null : slug)}
+                    >
+                      <span>{label}</span>
+                      <ChevronRight size={16} />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>
 
-        <button className={styles.applyBtn} onClick={onClose}>
+        <button type="button" className={styles.applyBtn} onClick={onApplyFilters}>
           Apply Filter
         </button>
       </aside>
