@@ -122,3 +122,4 @@ class ProductCategory(models.Model):
         ]
     def __str__(self) -> str:
         return f"product={self.product_id}, category={self.category_id}"
+        

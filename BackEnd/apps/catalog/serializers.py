@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import Product, Category, ProductCategory, ProductVariant
 
 
@@ -57,6 +58,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "category_mappings",
         ]
 
+    @extend_schema_field(CategorySerializer(allow_null=True))
     def get_primary_category(self, obj):
         # Ưu tiên mapping có is_primary=True, nếu không có thì lấy category đầu tiên
         primary = obj.product_categories.filter(is_primary=True).select_related("category").first()
