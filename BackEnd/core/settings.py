@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -162,6 +162,12 @@ DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
     parsed_db = urlparse(DATABASE_URL)
+    db_query = parse_qs(parsed_db.query)
+    db_options = {}
+    sslmode = db_query.get("sslmode", [None])[0]
+    if sslmode:
+        db_options["sslmode"] = sslmode
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -170,6 +176,7 @@ if DATABASE_URL:
             "PASSWORD": parsed_db.password or "",
             "HOST": parsed_db.hostname or "",
             "PORT": str(parsed_db.port or "5432"),
+            **({"OPTIONS": db_options} if db_options else {}),
         }
     }
 else:
