@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
+from urllib.parse import urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,20 +22,37 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _env_list(name: str, default: list[str]) -> list[str]:
+    raw = os.getenv(name)
+    if not raw:
+        return default
+    return [part.strip() for part in raw.split(",") if part.strip()]
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-c3)&0#7m*v-0zfwe$ra*py5$z7--u5*y$ojedo$+(*ca1&-9vp"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-dev-only-key-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = _env_bool("DEBUG", True)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-]
+CORS_ALLOWED_ORIGINS = _env_list(
+    "CORS_ALLOWED_ORIGINS",
+    [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ],
+)
 
 # Backward compatibility for older django-cors-headers versions
 CORS_ORIGIN_WHITELIST = CORS_ALLOWED_ORIGINS
@@ -139,16 +158,27 @@ SIMPLE_JWT = {
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "19022003",
-        "HOST": "localhost",
-        "PORT": "5432",
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+if DATABASE_URL:
+    parsed_db = urlparse(DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": parsed_db.path.lstrip("/"),
+            "USER": parsed_db.username or "",
+            "PASSWORD": parsed_db.password or "",
+            "HOST": parsed_db.hostname or "",
+            "PORT": str(parsed_db.port or "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
