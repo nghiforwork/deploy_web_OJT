@@ -374,6 +374,12 @@ $star-color: #ffc633;
   }
 }
 
+.sizeBtnDisabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .optionDivider {
   height: 0;
   border-bottom: 1px solid $gray-border;

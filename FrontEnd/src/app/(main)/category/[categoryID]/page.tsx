@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
 import ProductCard from "@/components/ProductCard/productCard";
@@ -19,7 +20,7 @@ import Breadcrumb from "@/components/Breadcrumb/breadcrumb";
 import type { CatalogProduct } from "@/types/catalog";
 import styles from "./category.module.scss";
 import SortDropdown from "@/components/SortDropdown/sortDropdown";
-import { SlidersHorizontal } from "lucide-react";
+import {  SlidersHorizontal } from "lucide-react";
 import { fetchCatalogProducts } from "@/services/catalog.service";
 
 const PAGE_SIZE = 9;
@@ -30,6 +31,7 @@ const SORT_ORDERING_BY_LABEL: Record<string, string> = {
   "Price: Low → High": "price",
   "Price: High → Low": "-price",
   "Top Rated": "-rating",
+  "On Sale": "-stock",
 };
 
 function formatCategoryTitle(categoryID: string): string {
@@ -49,6 +51,7 @@ function normalizeRouteCategorySlug(categoryID: string): string {
 type DraftFilters = {
   categorySlug: string;
   dressStyle: string | null;
+  onSale: boolean;
   color: string | null;
   size: string | null;
   priceMin: number;
@@ -58,6 +61,7 @@ type DraftFilters = {
 /** Đọc bộ lọc đã áp từ URL (nguồn sự thật cho API / breadcrumb). */
 function parseFiltersFromSearchParams(sp: URLSearchParams): {
   dressStyle: string | null;
+  onSale: boolean;
   color: string | null;
   size: string | null;
   priceMin: number;
@@ -65,6 +69,8 @@ function parseFiltersFromSearchParams(sp: URLSearchParams): {
 } {
   const ds = sp.get("dress_style");
   const dressStyle = ds && ds.length > 0 ? ds : null;
+  const sortEarly = sp.get("sort");
+  const onSale = sp.get("on_sale") === "1" || sortEarly === "On Sale";
   const colorRaw = sp.get("color");
   const color = colorRaw && colorRaw.length > 0 ? colorRaw : null;
   const sizeRaw = sp.get("size");
@@ -83,18 +89,23 @@ function parseFiltersFromSearchParams(sp: URLSearchParams): {
     if (!Number.isNaN(n)) priceMax = n;
   }
 
-  return { dressStyle, color, size, priceMin, priceMax };
+  return { dressStyle, onSale, color, size, priceMin, priceMax };
 }
 
 function buildCatalogQueryString(
   f: Omit<DraftFilters, "categorySlug">,
+  sortLabelForQuery?: string,
 ): string {
   const p = new URLSearchParams();
   if (f.dressStyle) p.set("dress_style", f.dressStyle);
+  if (f.onSale) p.set("on_sale", "1");
   if (f.color) p.set("color", f.color);
   if (f.size) p.set("size", f.size);
   p.set("min_price", String(f.priceMin));
   p.set("max_price", String(f.priceMax));
+  if (sortLabelForQuery && sortLabelForQuery !== "Most Popular") {
+    p.set("sort", sortLabelForQuery);
+  }
   return p.toString();
 }
 
@@ -138,6 +149,7 @@ function CategoryPageContent({
     ) {
       return sortParam;
     }
+    if (searchParams.get("on_sale") === "1") return "On Sale";
     return "Most Popular";
   });
 
@@ -145,6 +157,7 @@ function CategoryPageContent({
     normalizeRouteCategorySlug(categoryID),
   );
   const [draftDressStyle, setDraftDressStyle] = useState<string | null>(null);
+  const [draftOnSale, setDraftOnSale] = useState(false);
   const [draftColor, setDraftColor] = useState<string | null>(null);
   const [draftSize, setDraftSize] = useState<string | null>(null);
   const [draftPriceMin, setDraftPriceMin] = useState(0);
@@ -153,6 +166,7 @@ function CategoryPageContent({
   const draftFiltersRef = useRef<DraftFilters>({
     categorySlug: normalizeRouteCategorySlug(categoryID),
     dressStyle: null,
+    onSale: false,
     color: null,
     size: null,
     priceMin: 0,
@@ -169,6 +183,7 @@ function CategoryPageContent({
     const f = parseFiltersFromSearchParams(searchParams);
     setDraftCategorySlug(nextCategorySlug);
     setDraftDressStyle(f.dressStyle);
+    setDraftOnSale(f.onSale);
     setDraftColor(f.color);
     setDraftSize(f.size);
     setDraftPriceMin(f.priceMin);
@@ -176,6 +191,7 @@ function CategoryPageContent({
     draftFiltersRef.current = {
       categorySlug: nextCategorySlug,
       dressStyle: f.dressStyle,
+      onSale: f.onSale,
       color: f.color,
       size: f.size,
       priceMin: f.priceMin,
@@ -192,19 +208,24 @@ function CategoryPageContent({
     const {
       categorySlug,
       dressStyle,
+      onSale,
       color,
       size,
       priceMin,
       priceMax,
     } = draftFiltersRef.current;
     const currentSlug = normalizeRouteCategorySlug(categoryID);
-    const q = buildCatalogQueryString({
-      dressStyle,
-      color,
-      size,
-      priceMin,
-      priceMax,
-    });
+    const q = buildCatalogQueryString(
+      {
+        dressStyle,
+        onSale,
+        color,
+        size,
+        priceMin,
+        priceMax,
+      },
+      sortLabel,
+    );
     const path = `/category/${categorySlug}`;
     const href = q ? `${path}?${q}` : path;
 
@@ -225,6 +246,11 @@ function CategoryPageContent({
   function handleDraftDressStyleChange(slug: string | null) {
     setDraftDressStyle(slug);
     draftFiltersRef.current.dressStyle = slug;
+  }
+
+  function handleDraftOnSaleChange(next: boolean) {
+    setDraftOnSale(next);
+    draftFiltersRef.current.onSale = next;
   }
 
   function handleDraftColorChange(color: string | null) {
@@ -249,6 +275,7 @@ function CategoryPageContent({
     const f = parseFiltersFromSearchParams(searchParams);
     setDraftCategorySlug(slug);
     setDraftDressStyle(f.dressStyle);
+    setDraftOnSale(f.onSale);
     setDraftColor(f.color);
     setDraftSize(f.size);
     setDraftPriceMin(f.priceMin);
@@ -262,6 +289,8 @@ function CategoryPageContent({
       Object.prototype.hasOwnProperty.call(SORT_ORDERING_BY_LABEL, sortParam)
     ) {
       setSortLabel(sortParam);
+    } else if (f.onSale) {
+      setSortLabel("On Sale");
     } else {
       setSortLabel("Most Popular");
     }
@@ -269,6 +298,7 @@ function CategoryPageContent({
     draftFiltersRef.current = {
       categorySlug: slug,
       dressStyle: f.dressStyle,
+      onSale: f.onSale,
       color: f.color,
       size: f.size,
       priceMin: f.priceMin,
@@ -292,6 +322,7 @@ function CategoryPageContent({
           pageSize: PAGE_SIZE,
           categorySlug: categorySlugForApi,
           dressStyleSlug: appliedFilters.dressStyle,
+          onSale: appliedFilters.onSale,
           minPrice: appliedFilters.priceMin,
           maxPrice: appliedFilters.priceMax,
           color: appliedFilters.color,
@@ -305,7 +336,7 @@ function CategoryPageContent({
       } catch {
         if (!cancelled) {
           setError(
-            "Unable to load products. Check that the API is running and NEXT_PUBLIC_API matches your Django server (e.g. http://127.0.0.1:8000/).",
+            "Unable to load products. Check that the API is running and NEXT_PUBLIC_API matches your Django host:port (same value as runserver).",
           );
           setProducts([]);
           setTotalCount(0);
@@ -353,22 +384,24 @@ function CategoryPageContent({
         />
 
         <div className={styles.categoryLayout}>
-          <FilterSidebar
-            isOpen={isFilterOpen}
-            onClose={handleSidebarClose}
-            draftCategorySlug={draftCategorySlug}
-            onDraftCategoryChange={handleDraftCategoryChange}
-            dressStyleSlug={draftDressStyle}
-            onDressStyleChange={handleDraftDressStyleChange}
-            priceMin={draftPriceMin}
-            priceMax={draftPriceMax}
-            onPriceChange={handleDraftPriceChange}
-            selectedColor={draftColor}
-            selectedSize={draftSize}
-            onColorChange={handleDraftColorChange}
-            onSizeChange={handleDraftSizeChange}
-            onApplyFilters={handleApplyFilters}
-          />
+          <div className={styles.filterShell}>
+            <FilterSidebar
+              isOpen={isFilterOpen}
+              onClose={handleSidebarClose}
+              draftCategorySlug={draftCategorySlug}
+              onDraftCategoryChange={handleDraftCategoryChange}
+              dressStyleSlug={draftDressStyle}
+              onDressStyleChange={handleDraftDressStyleChange}
+              priceMin={draftPriceMin}
+              priceMax={draftPriceMax}
+              onPriceChange={handleDraftPriceChange}
+              selectedColor={draftColor}
+              selectedSize={draftSize}
+              onColorChange={handleDraftColorChange}
+              onSizeChange={handleDraftSizeChange}
+              onApplyFilters={handleApplyFilters}
+            />
+          </div>
 
           <div className={styles.mainContent}>
             <div className={styles.toolbar}>
@@ -384,6 +417,18 @@ function CategoryPageContent({
                   onChange={(next) => {
                     setSortLabel(next);
                     setPage(1);
+                    const p = new URLSearchParams(searchParams.toString());
+                    if (next === "Most Popular") {
+                      p.delete("sort");
+                    } else {
+                      p.set("sort", next);
+                    }
+                    if (next === "On Sale") {
+                      p.set("on_sale", "1");
+                    }
+                    const path = `/category/${normalizeRouteCategorySlug(categoryID)}`;
+                    const qs = p.toString();
+                    router.replace(qs ? `${path}?${qs}` : path);
                   }}
                 />
 
@@ -411,7 +456,10 @@ function CategoryPageContent({
               )}
               {!loading &&
                 products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <Link key={product.id} href={`/product/${product.id}`} className={styles.cardLink}>
+              <ProductCard product={product} />
+            </Link>
+                  
                 ))}
               {!loading && !error && products.length === 0 && (
                 <p className={styles.meta} style={{ gridColumn: "1 / -1" }}>

@@ -72,6 +72,7 @@ class ProductVariant(models.Model):
 
     class Meta:
         db_table = "product_variants"
+        ordering = ["color", "size", "id"]
         constraints = [
             models.UniqueConstraint(
                 fields=["product", "color", "size"],

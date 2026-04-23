@@ -1,6 +1,8 @@
-from django.db import models
 from django.conf import settings
-from apps.catalog.models import Product
+from django.db import models
+from django.db.models import Q
+
+from apps.catalog.models import Product, ProductVariant
 
 # Create your models here.
 class Cart(models.Model):
@@ -31,12 +33,27 @@ class CartItem(models.Model):
         related_name="cart_items",
         db_column="product_id",
     )
+    product_variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="cart_items",
+        db_column="product_variant_id",
+    )
     quantity = models.PositiveIntegerField(default=1)
+
     class Meta:
         db_table = "cart_items"
         constraints = [
             models.UniqueConstraint(
                 fields=["cart", "product"],
-                name="uniq_cart_product",
+                condition=Q(product_variant__isnull=True),
+                name="uniq_cart_product_no_variant",
+            ),
+            models.UniqueConstraint(
+                fields=["cart", "product_variant"],
+                condition=Q(product_variant__isnull=False),
+                name="uniq_cart_product_variant",
             ),
         ]

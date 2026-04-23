@@ -10,6 +10,18 @@ const FALLBACK_IMAGE_BY_SLUG: Record<string, string> = {
   gym: "/images/dress-style/gym.png",
 };
 
+function resolveDressStyleImage(imageUrl: string | null | undefined, slug: string): string {
+  const raw = imageUrl?.trim();
+  const candidate = raw && raw.length > 0 ? raw : FALLBACK_IMAGE_BY_SLUG[slug] ?? FALLBACK_IMAGE_BY_SLUG.casual;
+  if (candidate.startsWith("http://") || candidate.startsWith("https://")) {
+    return encodeURI(candidate);
+  }
+  if (candidate.startsWith("/")) {
+    return encodeURI(candidate);
+  }
+  return encodeURI(`/${candidate}`);
+}
+
 function getCardLayoutClass(slug: string): string {
   // Duy trì layout giống bản hard-code hiện tại.
   // Casual/Gym: short; Formal/Party: long.
@@ -46,11 +58,7 @@ export default async function DressStyle() {
             >
               <h3 className={styles.cardTitle}>{item.name}</h3>
               <Image
-                src={
-                  item.image_url ??
-                  FALLBACK_IMAGE_BY_SLUG[item.slug] ??
-                  FALLBACK_IMAGE_BY_SLUG.casual
-                }
+                src={resolveDressStyleImage(item.image_url, item.slug)}
                 alt={item.name}
                 fill
                 className={styles.cardImg}

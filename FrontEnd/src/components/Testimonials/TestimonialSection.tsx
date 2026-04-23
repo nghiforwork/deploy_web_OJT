@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import styles from "./testimonials.module.scss";
 import { Testimonial } from "@/types/testimonial";
-import TestimonialCard from "./testimonialCard";
+import TestimonialCard from "./TestimonialCard";
 
 
 const TESTIMONIAL_DATA: Testimonial[] = [

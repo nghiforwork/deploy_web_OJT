@@ -9,6 +9,7 @@ const SORT_OPTIONS = [
   "Price: Low → High",
   "Price: High → Low",
   "Top Rated",
+  "On Sale",
 ];
 
 type SortDropdownProps = {

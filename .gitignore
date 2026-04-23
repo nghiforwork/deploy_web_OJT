@@ -1,1 +1,11 @@
 BackEnd/.env
+
+# Python/Django cache
+**/__pycache__/
+*.py[cod]
+
+# Next.js build/cache
+FrontEnd/.next/
+
+# Local env files
+FrontEnd/.env.local

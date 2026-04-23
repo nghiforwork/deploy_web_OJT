@@ -23,17 +23,20 @@
 }
 
 .sidebar {
+  font-family: v.$font-body;
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 20px;
-  padding: 24px;
+  padding: 22px 20px;
   height: fit-content;
-  position: sticky;
-  top: 20px;
-  z-index: 10;
-  max-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+
+  @media (min-width: 1025px) {
+    padding: 24px;
+    max-height: none;
+  }
 
   @media (max-width: 1024px) {
     position: fixed;
@@ -42,8 +45,9 @@
     bottom: 0;
     width: min(320px, 90%);
     max-width: min(320px, 90%);
-    max-height: 95%;
-    
+    max-height: 100dvh;
+    min-height: 0;
+
     border: none; 
     border-radius: 0; 
     border-top-left-radius: 20px; 
@@ -86,11 +90,35 @@
 }
 
 .scrollContent {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 10px;
-  
-  &::-webkit-scrollbar { width: 0; }
+  min-height: 0;
+
+  @media (min-width: 1025px) {
+    flex: 0 1 auto;
+    overflow: visible;
+    padding: 0;
+  }
+
+  @media (max-width: 1024px) {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 4px 0 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
 }
 
 .section {
@@ -98,7 +126,12 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   margin-bottom: 24px;
   &:last-of-type { border-bottom: none; }
-  h4 { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; }
+  h4 {
+    font-family: v.$font-body;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+  }
 }
 
 .list {
@@ -106,6 +139,7 @@
   padding: 0;
   margin: 0;
   .listItem {
+    font-family: v.$font-body;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -276,7 +310,9 @@
 }
 
 .applyBtn {
-  margin-top: auto;
+  font-family: v.$font-body;
+  flex-shrink: 0;
+  margin-top: 16px;
   width: 100%;
   padding: 16px;
   background: #000;
@@ -285,4 +321,8 @@
   border-radius: 62px;
   font-weight: 500;
   cursor: pointer;
+
+  @media (max-width: 1024px) {
+    margin-top: auto;
+  }
 }

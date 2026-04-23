@@ -2,8 +2,7 @@ import Image from "next/image";
 import { Star, StarHalf } from "lucide-react";
 import styles from "./productCard.module.scss";
 import type { CatalogProduct } from "@/types/catalog";
-
-const PLACEHOLDER_IMAGE = "/images/products/black-tshirt.png";
+import { resolveCatalogProductImageSrc } from "@/utils/catalogProductImage";
 
 function toNumber(value: string | number): number {
   if (typeof value === "number") return value;
@@ -12,10 +11,7 @@ function toNumber(value: string | number): number {
 }
 
 export default function ProductCard({ product }: { product: CatalogProduct }) {
-  const imageSrc =
-    product.image_url && product.image_url.trim() !== ""
-      ? product.image_url.trim()
-      : PLACEHOLDER_IMAGE;
+  const safeImageSrc = resolveCatalogProductImageSrc(product);
   const rating = toNumber(product.rating);
   const price = toNumber(product.price);
   const originalPrice =
@@ -41,7 +37,7 @@ export default function ProductCard({ product }: { product: CatalogProduct }) {
     <div className={styles.card}>
       <div className={styles.imageWrapper}>
         <Image
-          src={imageSrc}
+          src={safeImageSrc}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 100vw, 25vw"

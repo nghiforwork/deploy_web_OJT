@@ -165,6 +165,7 @@
 .actions {
   display: flex;
   gap: 16px;
+  align-items: center;
 
   a {
     color: #000;
@@ -173,6 +174,118 @@
       opacity: 0.6;
     }
   }
+}
+
+.userMenu {
+  position: relative;
+}
+
+.userMenuButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #000;
+  padding: 0;
+  font: inherit;
+}
+
+.greeting {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.userDropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 170px;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 30;
+
+  li {
+    width: 100%;
+  }
+
+  a,
+  button {
+    width: 100%;
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f6f6f6;
+    }
+  }
+}
+
+.logoutConfirmOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.logoutConfirmModal {
+  width: min(420px, 100%);
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.logoutConfirmActions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancelBtn,
+.confirmBtn {
+  border: none;
+  border-radius: 10px;
+  padding: 9px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancelBtn {
+  background: #f1f1f1;
+  color: #111;
+}
+
+.confirmBtn {
+  background: #111;
+  color: #fff;
 }
 
 .leftSection {
@@ -343,6 +456,10 @@
 
   .actions {
     gap: 12px;
+  }
+
+  .greeting {
+    display: none;
   }
 }
 

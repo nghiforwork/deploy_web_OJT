@@ -1,0 +1,242 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "parent": null,
+      "name": "Men",
+      "slug": "men",
+      "description": "Fashion items for men",
+      "image_url": "/images/categories/men.png",
+      "is_active": true,
+      "sort_order": 1,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "parent": null,
+      "name": "Women",
+      "slug": "women",
+      "description": "Fashion items for women",
+      "image_url": "/images/categories/women.png",
+      "is_active": true,
+      "sort_order": 2,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 3,
+    "fields": {
+      "parent": null,
+      "name": "T-Shirts",
+      "slug": "t-shirts",
+      "description": "Casual t-shirts collection",
+      "image_url": "/images/categories/t-shirts.png",
+      "is_active": true,
+      "sort_order": 3,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 1,
+    "fields": {
+      "name": "Black Orange T-Shirt",
+      "slug": "black-orange-tshirt",
+      "description": "Comfort fit t-shirt with black and orange tones.",
+      "image_url": "/images/products/black-orange-tshirt.png",
+      "price": "249000.00",
+      "original_price": "299000.00",
+      "discount_label": "-17%",
+      "rating": "4.50",
+      "stock": 35,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 2,
+    "fields": {
+      "name": "Purple Shirt",
+      "slug": "purple-shirt",
+      "description": "Elegant purple shirt suitable for both work and casual events.",
+      "image_url": "/images/products/purple-shirt.png",
+      "price": "349000.00",
+      "original_price": "429000.00",
+      "discount_label": "-19%",
+      "rating": "4.70",
+      "stock": 24,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "name": "Black Jeans",
+      "slug": "black-jeans",
+      "description": "Slim-fit black jeans made from durable denim.",
+      "image_url": "/images/products/black-jeans.png",
+      "price": "499000.00",
+      "original_price": "599000.00",
+      "discount_label": "-17%",
+      "rating": "4.60",
+      "stock": 18,
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productcategory",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "category": 1,
+      "is_primary": true,
+      "created_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productcategory",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "category": 3,
+      "is_primary": false,
+      "created_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productcategory",
+    "pk": 3,
+    "fields": {
+      "product": 2,
+      "category": 2,
+      "is_primary": true,
+      "created_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productcategory",
+    "pk": 4,
+    "fields": {
+      "product": 3,
+      "category": 1,
+      "is_primary": true,
+      "created_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "color": "#000000",
+      "size": "M",
+      "stock": 10,
+      "sku": "BO-TS-M-BLK",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "color": "#F97316",
+      "size": "L",
+      "stock": 12,
+      "sku": "BO-TS-L-ORG",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 7,
+    "fields": {
+      "product": 1,
+      "color": "#000000",
+      "size": "L",
+      "stock": 10,
+      "sku": "BO-TS-L-BLK",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 8,
+    "fields": {
+      "product": 1,
+      "color": "#F97316",
+      "size": "M",
+      "stock": 11,
+      "sku": "BO-TS-M-ORG",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 3,
+    "fields": {
+      "product": 2,
+      "color": "#7C3AED",
+      "size": "M",
+      "stock": 8,
+      "sku": "PP-SH-M-PUR",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 4,
+    "fields": {
+      "product": 2,
+      "color": "#7C3AED",
+      "size": "L",
+      "stock": 6,
+      "sku": "PP-SH-L-PUR",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 5,
+    "fields": {
+      "product": 3,
+      "color": "#111827",
+      "size": "32",
+      "stock": 9,
+      "sku": "BJ-32-BLK",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.productvariant",
+    "pk": 6,
+    "fields": {
+      "product": 3,
+      "color": "#111827",
+      "size": "34",
+      "stock": 9,
+      "sku": "BJ-34-BLK",
+      "created_at": "2026-04-01T08:00:00Z",
+      "updated_at": "2026-04-01T08:00:00Z"
+    }
+  }
+]

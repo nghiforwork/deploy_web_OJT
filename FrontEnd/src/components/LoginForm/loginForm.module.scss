@@ -190,6 +190,23 @@ $radius-pill: 9999px;
     outline: 2px solid $text-heading;
     outline-offset: 2px;
   }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.errorMessage {
+  margin: -0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #b91c1c;
+}
+
+.successMessage {
+  margin: -0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #047857;
 }
 
 .divider {

@@ -2,25 +2,32 @@
 
 .categoryLayout {
   display: grid;
-  grid-template-columns: 295px 1fr;
-  gap: 24px;
-  margin-bottom: 200px;
+  grid-template-columns: minmax(260px, 295px) 1fr;
+  gap: 28px;
+  margin-bottom: 56px;
   align-items: start;
-  padding-left: 50px;
-  padding-right: 50px;
+  padding-inline: clamp(16px, 4vw, 80px);
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    padding-left: 16px;
-    padding-right: 16px;
-    margin-bottom: 100px;
+    margin-bottom: 48px;
   }
 
   @media (max-width: 480px) {
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-bottom: 80px;
+    margin-bottom: 40px;
     gap: 16px;
+  }
+}
+
+.filterShell {
+  min-width: 0;
+
+  @media (min-width: 1025px) {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    z-index: 2;
+    max-width: 100%;
   }
 }
 
@@ -53,6 +60,7 @@
   }
 
   .meta {
+    font-family: v.$font-body;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -121,6 +129,18 @@
   }
 }
 
+.cardLink {
+  color: #000;
+  text-decoration: none;
+
+  &:visited,
+  &:hover,
+  &:active {
+    color: #000;
+    text-decoration: none;
+  }
+}
+
 .divider {
   height: 1px;
   background-color: rgba(0, 0, 0, 0.1);
@@ -143,6 +163,7 @@
   }
 
   .navBtn {
+    font-family: v.$font-body;
     padding: 8px 16px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -169,6 +190,7 @@
     }
 
     button {
+      font-family: v.$font-body;
       width: 40px;
       height: 40px;
       min-width: 36px;

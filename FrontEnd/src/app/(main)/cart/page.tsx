@@ -1,38 +1,157 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
+import { getAuthSession } from "@/services/authService";
+import { deleteCartItem, fetchMyCart, updateCartItem, type CartDto, type CartItemDto } from "@/services/cart.service";
 import styles from "./page.module.scss";
 
-const MOCK_CART_ITEMS = [
-  { id: 1, title: "Gradient T-Shirt", size: "Large", color: "Black", price: 145, quantity: 1, image: "/images/Image cart/image 8.png" },
-  { id: 2, title: "Casual Shirt", size: "L", color: "Navy", price: 89, quantity: 2, image: "/images/Image cart/image 9.png" },
-  { id: 3, title: "Slim Fit Jeans", size: "32", color: "Blue", price: 120, quantity: 1, image: "/images/Image cart/image 10.png" },
-];
+const FALLBACK_IMAGE_BY_SLUG: Record<string, string> = {
+  "black-orange-tshirt": "/images/products/black-orange-tshirt.png",
+  "purple-shirt": "/images/products/purple-shirt.png",
+  "black-jeans": "/images/products/black-jeans.png",
+  "moss-green-tshirt": "/images/products/moss-green-tshirt.png",
+  "gradient-graphic-tshirt": "/images/Image product/image 9.png",
+  "gray-zip-hoodie": "/images/Image product/image 7.png",
+  "basic-white-tee": "/images/Image product/image 10.png",
+};
+
+const FALLBACK_IMAGE_BY_PRODUCT_ID: Record<number, string> = {
+  1: "/images/products/black-orange-tshirt.png",
+  2: "/images/products/purple-shirt.png",
+  3: "/images/products/black-jeans.png",
+  5: "/images/Image product/image 9.png",
+  6: "/images/Image product/image 7.png",
+  7: "/images/Image product/image 10.png",
+  25: "/images/products/moss-green-tshirt.png",
+  26: "/images/Image product/image 9.png",
+};
+
+function cartItemHasVariant(item: CartItemDto): boolean {
+  if (item.variant_color || item.variant_size) return true;
+  const raw = item.product_variant_id;
+  if (raw === null || raw === undefined) return false;
+  if (typeof raw === "number") return Number.isFinite(raw) && raw > 0;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0;
+}
+
+function resolveProductImage(item: CartItemDto): string {
+  const raw = item.product_image_url?.trim();
+  if (raw) {
+    if (raw.startsWith("http://") || raw.startsWith("https://")) return encodeURI(raw);
+    if (raw.startsWith("/")) return encodeURI(raw);
+    return encodeURI(`/${raw}`);
+  }
+
+  const slugFallback = FALLBACK_IMAGE_BY_SLUG[item.product_slug];
+  if (slugFallback) return slugFallback;
+
+  const idFallback = FALLBACK_IMAGE_BY_PRODUCT_ID[item.product_id];
+  if (idFallback) return idFallback;
+
+  return "/images/Image product/image 2.png";
+}
 
 export default function CartPage() {
-  const [items, setItems] = useState(MOCK_CART_ITEMS);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [cart, setCart] = useState<CartDto | null>(null);
   const [promoCode, setPromoCode] = useState("");
+  const [clearingLegacy, setClearingLegacy] = useState(false);
 
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const discountPercent = 20;
-  const discountAmount = (subtotal * discountPercent) / 100;
-  const deliveryFee = 15;
-  const total = subtotal - discountAmount + deliveryFee;
+  useEffect(() => {
+    const authSession = getAuthSession();
+    if (!authSession?.access) {
+      router.replace(`/?auth=login&redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+    setIsCheckingAuth(false);
+  }, [pathname, router]);
 
-  const updateQuantity = (id: number, delta: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-      )
-    );
+  useEffect(() => {
+    if (isCheckingAuth) return;
+
+    let cancelled = false;
+    async function loadCart() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchMyCart();
+        if (cancelled) return;
+        setCart(data);
+      } catch {
+        if (cancelled) return;
+        setError("Unable to load cart. Please try again.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadCart();
+    return () => {
+      cancelled = true;
+    };
+  }, [isCheckingAuth]);
+
+  const legacyItems = useMemo(
+    () => (cart?.items ?? []).filter((i) => !cartItemHasVariant(i)),
+    [cart],
+  );
+
+  if (isCheckingAuth) {
+    return null;
+  }
+
+  const items = cart?.items ?? [];
+  const subtotal = Number(cart?.subtotal_amount ?? 0);
+  const discountAmount = Number(cart?.discount_amount ?? 0);
+  const deliveryFee = Number(cart?.shipping_amount ?? 0);
+  const total = Number(cart?.total_amount ?? 0);
+  const discountPercent = subtotal ? Math.round((discountAmount / subtotal) * 100) : 0;
+
+  const updateQuantity = async (id: number, delta: number) => {
+    const currentItem = items.find((item) => item.id === id);
+    if (!currentItem) return;
+    const nextQty = Math.max(1, currentItem.quantity + delta);
+    try {
+      const updatedCart = await updateCartItem(id, nextQty);
+      setCart(updatedCart);
+    } catch {
+      setError("Unable to update quantity. Please try again.");
+    }
   };
 
-  const removeItem = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const removeItem = async (id: number) => {
+    try {
+      const updatedCart = await deleteCartItem(id);
+      setCart(updatedCart);
+    } catch {
+      setError("Unable to remove item. Please try again.");
+    }
+  };
+
+  const removeLegacyLines = async () => {
+    if (legacyItems.length === 0) return;
+    setClearingLegacy(true);
+    setError(null);
+    try {
+      for (const it of legacyItems) {
+        await deleteCartItem(it.id);
+      }
+      setCart(await fetchMyCart());
+    } catch {
+      setError("Unable to remove legacy cart lines. Please try again.");
+    } finally {
+      setClearingLegacy(false);
+    }
   };
 
   return (
@@ -46,25 +165,83 @@ export default function CartPage() {
             <span>Cart</span>
           </nav>
           <h1 className={styles.pageTitle}>YOUR CART</h1>
+          {error && <p className={styles.emptyCart}>{error}</p>}
+          {legacyItems.length > 0 ? (
+            <div className={styles.legacyBanner} role="status">
+              <p>
+                {legacyItems.length} line(s) were saved before color/size could be stored. Remove them, then add
+                products again from the product page so each variant shows correctly.
+              </p>
+              <button
+                type="button"
+                className={styles.legacyBannerBtn}
+                disabled={clearingLegacy}
+                onClick={() => void removeLegacyLines()}
+              >
+                {clearingLegacy ? "Removing…" : "Remove legacy lines"}
+              </button>
+            </div>
+          ) : null}
 
           <div className={styles.cartContent}>
             {/* Left: Cart Items */}
             <section className={styles.cartItems}>
-              {items.length === 0 ? (
+              {loading ? (
+                <p className={styles.emptyCart}>Loading cart...</p>
+              ) : items.length === 0 ? (
                 <p className={styles.emptyCart}>Your cart is empty.</p>
               ) : (
                 <ul className={styles.itemList}>
                   {items.map((item) => (
                     <li key={item.id} className={styles.cartItem}>
                       <div className={styles.itemImage}>
-                        {item.image && (
-                          <Image src={item.image} alt={item.title} fill sizes="(max-width: 479px) 80px, (max-width: 767px) 100px, 120px" className={styles.itemImg} />
-                        )}
+                        <Image
+                          src={resolveProductImage(item)}
+                          alt={item.product_name}
+                          fill
+                          sizes="(max-width: 479px) 80px, (max-width: 767px) 100px, 120px"
+                          className={styles.itemImg}
+                        />
                       </div>
                       <div className={styles.itemInfo}>
-                        <h3 className={styles.itemTitle}>{item.title}</h3>
-                        <p className={styles.itemMeta}>Size: {item.size} | Color: {item.color}</p>
-                        <p className={styles.itemPrice}>${item.price * item.quantity}</p>
+                        <h3 className={styles.itemTitle}>{item.product_name}</h3>
+                        <p className={styles.itemMeta}>
+                          {cartItemHasVariant(item) ? (
+                            <span className={styles.variantLine}>
+                              {item.variant_color ? (
+                                <span
+                                  className={styles.variantSwatch}
+                                  style={{ backgroundColor: item.variant_color }}
+                                  title={item.variant_color}
+                                  aria-hidden
+                                />
+                              ) : null}
+                              <span>
+                                {item.variant_size ? <>Size: {item.variant_size}</> : null}
+                                {item.variant_size && item.variant_color ? " · " : null}
+                                {item.variant_color ? <>Color: {item.variant_color}</> : null}
+                                {!item.variant_size && !item.variant_color ? (
+                                  <>Variant #{item.product_variant_id}</>
+                                ) : null}
+                              </span>
+                            </span>
+                          ) : (
+                            <>
+                              Product #{item.product_id}
+                              <span className={styles.itemMetaHint}>
+                                {" "}
+                                — no variant on this line. Remove it and re-add from the product page to save
+                                color/size.
+                              </span>
+                            </>
+                          )}
+                        </p>
+                        <p className={styles.itemPrice}>${Number(item.line_total).toFixed(2)}</p>
+                        {item.quantity > 1 ? (
+                          <p className={styles.itemPriceBreakdown}>
+                            {item.quantity} × ${Number(item.unit_price).toFixed(2)}
+                          </p>
+                        ) : null}
                       </div>
                       <div className={styles.itemActions}>
                         <button
@@ -135,10 +312,17 @@ export default function CartPage() {
                 </div>
                 <button type="button" className={styles.applyBtn}>Apply</button>
               </div>
-              <Link href="#" className={styles.checkoutBtn}>
-                Go to Checkout
-                <ArrowRightIcon />
-              </Link>
+              {items.length === 0 ? (
+                <span className={`${styles.checkoutBtn} ${styles.checkoutBtnDisabled}`} aria-disabled="true">
+                  Go to Checkout
+                  <ArrowRightIcon />
+                </span>
+              ) : (
+                <Link href="/orders/checkout" className={styles.checkoutBtn}>
+                  Go to Checkout
+                  <ArrowRightIcon />
+                </Link>
+              )}
             </aside>
           </div>
         </div>

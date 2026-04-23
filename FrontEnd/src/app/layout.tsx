@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import "@/styles/global.scss";
-import localFont from "next/font/local";
+import { Montserrat, Manrope } from "next/font/google";
 import AuthOverlay from "@/components/AuthOverlay/authOverlay";
 
-// Cấu hình font Integral CF
-const integralCF = localFont({
-  src: "../../public/fonts/IntegralCF-Bold.woff2",
+// Thay thế font local bị thiếu bằng Google Font ổn định.
+// Vẫn giữ nguyên CSS variable name để không phải sửa toàn bộ SCSS.
+const integralCF = Montserrat({
+  subsets: ["latin"],
   variable: "--font-integral",
-  weight: "700",
+  weight: ["700", "800", "900"],
   display: "swap",
 });
 
-// Cấu hình font Satoshi
-const satoshi = localFont({
-  src: "../../public/fonts/Satoshi-Variable.woff2",
+const satoshi = Manrope({
+  subsets: ["latin"],
   variable: "--font-satoshi",
-  weight: "300 900",
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 

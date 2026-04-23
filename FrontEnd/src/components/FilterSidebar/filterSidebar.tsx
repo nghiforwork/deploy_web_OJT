@@ -2,17 +2,27 @@
 import React from "react";
 import { SlidersHorizontal, ChevronRight, Check, X } from "lucide-react";
 import styles from "./filterSidebar.module.scss";
+import { CATALOG_PRICE_SLIDER_MAX } from "@/constants/catalogPriceRange";
 
-const COLORS = ["#00C129", "#F50606", "#F5DD06", "#F57906", "#06CAF5", "#063AF5", "#7D06F5", "#F506A4", "#FFFFFF", "#000000"];
-const SIZES = ["XX-Small", "X-Small", "Small", "Medium", "Large", "X-Large", "XX-Large", "3X-Large", "4X-Large"];
+const COLORS = [
+  "#000000",
+  "#F97316",
+  "#7C3AED",
+  "#111827",
+  "#3A5F0B",
+  "#1F2937",
+  "#D1D5DB",
+  "#FFFFFF",
+];
+const SIZES = ["S", "M", "L", "XL", "32", "34"];
 
 /** Slug khớp với `Category.slug` trên API và đường dẫn `/category/[slug]`. */
 const CATEGORY_NAV: { label: string; slug: string }[] = [
   { label: "All", slug: "all" },
+  { label: "Men", slug: "men" },
+  { label: "Women", slug: "women" },
   { label: "T-shirts", slug: "t-shirts" },
-  { label: "Shorts", slug: "shorts" },
   { label: "Shirts", slug: "shirts" },
-  { label: "Hoodie", slug: "hoodie" },
   { label: "Jeans", slug: "jeans" },
 ];
 
@@ -30,8 +40,7 @@ export function getDressStyleLabel(slug: string | null): string | null {
   return found?.label ?? null;
 }
 
-/** Trùng với trần slider giá; mặc định khoảng lọc 0…MAX (không hẹp cửa ban đầu). */
-export const PRICE_SLIDER_MAX = 500;
+export const PRICE_SLIDER_MAX = CATALOG_PRICE_SLIDER_MAX;
 
 interface FilterSidebarProps {
   isOpen: boolean;

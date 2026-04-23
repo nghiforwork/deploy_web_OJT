@@ -1,0 +1,1 @@
+export const CATALOG_PRICE_SLIDER_MAX = 700;

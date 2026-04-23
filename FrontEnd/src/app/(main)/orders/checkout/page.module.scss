@@ -1,0 +1,177 @@
+@use "@/styles/variable.scss" as v;
+
+$gray-text: #6b7280;
+$gray-border: #e5e5e5;
+$black: #000;
+$white: #fff;
+$border-radius-pill: 50px;
+$container-max: 1240px;
+
+.container {
+  max-width: $container-max;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.section {
+  border-top: 1px solid $gray-border;
+  padding-top: 24px;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: $gray-text;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: $black;
+  }
+}
+
+.title {
+  font-family: v.$font-heading;
+  font-size: 31px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: $gray-text;
+  font-size: 18px;
+}
+
+.layout {
+  display: grid;
+  gap: 28px;
+  align-items: start;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr 1.1fr;
+  }
+}
+
+.summary {
+  border: 1px solid $gray-border;
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+
+.summaryTitle {
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 12px;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 17px;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.lineName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.totalLine {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $gray-border;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.input {
+  border: 1px solid $gray-border;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 18px;
+  outline: none;
+
+  &:focus {
+    border-color: #999;
+  }
+}
+
+.paymentOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radioRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.submitBtn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 16px 24px;
+  min-height: 52px;
+  background: $black;
+  color: $white;
+  border: none;
+  border-radius: $border-radius-pill;
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 16px;
+  margin: 0;
+}
+
+.hint {
+  font-size: 16px;
+  color: $gray-text;
+  margin: 0;
+}

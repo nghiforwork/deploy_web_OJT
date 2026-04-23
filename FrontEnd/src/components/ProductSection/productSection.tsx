@@ -23,7 +23,7 @@ export default function ProductSection({
         <h2 className={styles.title}>{title}</h2>
         <div className={styles.grid}>
           {products.map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`} className={styles.cardLink}>
+            <Link key={product.id} href={`/product/${product.slug || product.id}`} className={styles.cardLink}>
               <ProductCard product={product} />
             </Link>
           ))}

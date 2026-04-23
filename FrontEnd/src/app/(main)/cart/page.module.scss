@@ -107,6 +107,45 @@ $container-max: 1240px;
   margin: 0;
 }
 
+.legacyBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border: 1px solid $gray-border;
+  border-radius: $border-radius-lg;
+  background: $gray-light;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: $gray-text;
+    line-height: 1.45;
+  }
+}
+
+.legacyBannerBtn {
+  align-self: flex-start;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: $border-radius-pill;
+  border: none;
+  cursor: pointer;
+  background: $black;
+  color: $white;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: lighten($black, 12%);
+  }
+}
+
 .itemList {
   list-style: none;
   margin: 0;
@@ -189,6 +228,30 @@ $container-max: 1240px;
   }
 }
 
+.itemMetaHint {
+  display: inline;
+  font-size: 12px;
+  font-style: italic;
+  color: $gray-text;
+  opacity: 0.92;
+}
+
+.variantLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.variantSwatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
 .itemPrice {
   font-size: 18px;
   font-weight: 700;
@@ -198,6 +261,13 @@ $container-max: 1240px;
   @media (min-width: 480px) {
     font-size: 20px;
   }
+}
+
+.itemPriceBreakdown {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $gray-text;
 }
 
 .itemActions {
@@ -469,5 +539,11 @@ $container-max: 1240px;
   svg {
     flex-shrink: 0;
   }
+}
+
+.checkoutBtnDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 

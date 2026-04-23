@@ -1,38 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import Navigation from "@/components/Navigation/navigation";
 import Footer from "@/components/Footer/footer";
 import ProductCard from "@/components/ProductCard/productCard";
 import type { CatalogProduct } from "@/types/catalog";
+import {
+  fetchCatalogProductDetail,
+  fetchCatalogProductDetailByNumericId,
+  fetchCatalogProducts,
+} from "@/services/catalog.service";
+import { getAuthSession } from "@/services/authService";
+import { addCartItem } from "@/services/cart.service";
+import { resolveCatalogProductImageSrc } from "@/utils/catalogProductImage";
 import styles from "./page.module.scss";
 
-const PRODUCT_IMAGES = [
-  "/images/Image product/image 2.png",
-  "/images/Image product/image 5.png",
-  "/images/Image product/image 6.png",
-];
+function normalizeVariantColor(value: string): string {
+  let s = String(value).trim().toLowerCase();
+  if (/^#[0-9a-f]{3}$/.test(s)) {
+    const r = s[1];
+    const g = s[2];
+    const b = s[3];
+    s = `#${r}${r}${g}${g}${b}${b}`;
+  }
+  return s;
+}
 
-const MOCK_PRODUCT = {
-  id: 1,
-  name: "ONE LIFE GRAPHIC TSHIRT",
-  image: PRODUCT_IMAGES[0],
-  images: PRODUCT_IMAGES,
-  rating: 4.5,
-  price: 260,
-  originalPrice: 300,
-  discountLabel: "-30%",
-  description:
-    "This graphic t-shirt which is perfect for any occasion. Crafted from a soft cotton blend, it offers superior comfort and style. The graphic print adds a touch of personality to your everyday look. Whether you're heading to a casual outing or just relaxing at home, this tee has you covered.",
-  colors: [
-    { name: "Olive", value: "#8B7355" },
-    { name: "Dark Green", value: "#2D5016" },
-    { name: "Navy", value: "#1e3a5f" },
-  ],
-  sizes: ["Small", "Medium", "Large", "X-Large"],
-};
+/** Cùng logic với useMemo uiModel — dùng lại khi add để luôn khớp `fresh` từ API. */
+function buildColorSizeOptionsFromProduct(p: CatalogProduct): {
+  colorEntries: { name: string; value: string }[];
+  sizes: string[];
+} {
+  const variants = p.variants ?? [];
+  const colorValues = Array.from(new Set(variants.map((v) => v.color))).filter(Boolean);
+  const sizes = Array.from(new Set(variants.map((v) => v.size))).filter(Boolean);
+  return {
+    colorEntries: colorValues.map((value) => ({ name: value, value })),
+    sizes,
+  };
+}
+
+function normalizeVariantSize(value: string): string {
+  return String(value).trim().toLowerCase();
+}
+
+function resolveVariantId(
+  p: CatalogProduct,
+  colorHex: string,
+  sizeLabel: string,
+): number | undefined {
+  const variants = p.variants ?? [];
+  if (variants.length === 0) return undefined;
+  const colorKey = normalizeVariantColor(colorHex);
+  const sizeKey = normalizeVariantSize(sizeLabel);
+  const match = variants.find(
+    (v) => normalizeVariantColor(String(v.color)) === colorKey && normalizeVariantSize(String(v.size)) === sizeKey,
+  );
+  if (!match) return undefined;
+  const raw = (match as { id?: unknown }).id;
+  if (raw == null || raw === "") return undefined;
+  const n = typeof raw === "number" ? raw : Number.parseInt(String(raw), 10);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
 
 const MOCK_REVIEWS = [
   { id: 1, name: "Samantha D.", rating: 5, text: "The quality is amazing! Fits perfectly and the fabric is so soft. Will definitely buy again.", date: "August 15, 2023", verified: true },
@@ -43,55 +75,268 @@ const MOCK_REVIEWS = [
   { id: 6, name: "Michael P.", rating: 5, text: "Excellent product. Would recommend to anyone looking for a quality graphic tee.", date: "August 3, 2023", verified: true },
 ];
 
-const RELATED_PRODUCTS: CatalogProduct[] = [
-  {
-    id: 2,
-    name: "Polo with Contrast Trims",
-    slug: "polo-with-contrast-trims",
-    image_url: "/images/Image product/image 7.png",
-    rating: 4.5,
-    price: 212,
-    original_price: 232,
-    discount_label: "-20%",
-  },
-  {
-    id: 3,
-    name: "Black Striped T-shirt",
-    slug: "black-striped-t-shirt",
-    image_url: "/images/Image product/image 8.png",
-    rating: 5.0,
-    price: 120,
-    original_price: 160,
-    discount_label: "-30%",
-  },
-  {
-    id: 4,
-    name: "Gradient Graphic T-shirt",
-    slug: "gradient-graphic-t-shirt",
-    image_url: "/images/Image product/image 9.png",
-    rating: 4.0,
-    price: 145,
-  },
-  {
-    id: 5,
-    name: "Checkered Shirt",
-    slug: "checkered-shirt",
-    image_url: "/images/Image product/image 10.png",
-    rating: 4.5,
-    price: 180,
-  },
-];
+const DRESS_STYLE_SLUGS = new Set(["casual", "formal", "party", "gym"]);
+
+const PRODUCT_IMAGE_THUMB_SLOTS = 3;
+
+/** Breadcrumb: Home → Shop → Men|Women (if any) → primary type category → current product name. */
+function buildProductBreadcrumbSegments(product: CatalogProduct): { label: string; href: string }[] {
+  const segments: { label: string; href: string }[] = [
+    { label: "Home", href: "/" },
+    { label: "Shop", href: "/category/all" },
+  ];
+  const cats = product.categories ?? [];
+  const dept = cats.find((c) => c.slug === "men" || c.slug === "women");
+  let typeCat = product.primary_category ?? null;
+  if (typeCat && DRESS_STYLE_SLUGS.has(typeCat.slug)) {
+    typeCat = cats.find((c) => !DRESS_STYLE_SLUGS.has(c.slug)) ?? typeCat;
+  }
+  if (dept) {
+    segments.push({ label: dept.name, href: `/category/${dept.slug}` });
+  }
+  if (typeCat && typeCat.slug !== dept?.slug) {
+    segments.push({ label: typeCat.name, href: `/category/${typeCat.slug}` });
+  }
+  return segments;
+}
+
+/** Slug cho API related: primary / category không phải dress-style, hoặc dress-style nếu chỉ có loại đó. */
+function pickRelatedCatalogQuery(product: CatalogProduct): {
+  categorySlug?: string | null;
+  dressStyleSlug?: string | null;
+} | null {
+  const primary = product.primary_category;
+  if (primary && !DRESS_STYLE_SLUGS.has(primary.slug)) {
+    return { categorySlug: primary.slug };
+  }
+  const cats = product.categories ?? [];
+  const nonDress = cats.find((c) => !DRESS_STYLE_SLUGS.has(c.slug));
+  if (nonDress) {
+    return { categorySlug: nonDress.slug };
+  }
+  const onlyDress = cats.find((c) => DRESS_STYLE_SLUGS.has(c.slug));
+  if (onlyDress) {
+    return { dressStyleSlug: onlyDress.slug };
+  }
+  return null;
+}
 
 type TabId = "details" | "reviews" | "faq";
 
 export default function ProductPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams<{ productID: string }>();
+  const productID = params?.productID;
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(2); // Large
+  const [selectedSize, setSelectedSize] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<TabId>("reviews");
 
-  const product = MOCK_PRODUCT;
+  const [product, setProduct] = useState<CatalogProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [cartActionError, setCartActionError] = useState<string | null>(null);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [relatedProducts, setRelatedProducts] = useState<CatalogProduct[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!productID) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchCatalogProductDetail(productID);
+        if (cancelled) return;
+        setProduct(data);
+        setSelectedImage(0);
+        setSelectedColor(0);
+        setSelectedSize(0);
+      } catch {
+        if (cancelled) return;
+        setError(
+          "Unable to load product. Check that the API is running and NEXT_PUBLIC_API matches your Django server.",
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [productID]);
+
+  useEffect(() => {
+    if (!product) {
+      setRelatedProducts([]);
+      setRelatedLoading(false);
+      return;
+    }
+    const current = product;
+    let cancelled = false;
+    async function loadRelated() {
+      setRelatedLoading(true);
+      try {
+        const query = pickRelatedCatalogQuery(current);
+        if (!query) {
+          if (!cancelled) setRelatedProducts([]);
+          return;
+        }
+        const { results } = await fetchCatalogProducts({
+          categorySlug: query.categorySlug ?? undefined,
+          dressStyleSlug: query.dressStyleSlug ?? undefined,
+          pageSize: 12,
+          ordering: "-created_at",
+        });
+        const filtered = results.filter((p) => p.id !== current.id).slice(0, 4);
+        if (!cancelled) setRelatedProducts(filtered);
+      } catch {
+        if (!cancelled) setRelatedProducts([]);
+      } finally {
+        if (!cancelled) setRelatedLoading(false);
+      }
+    }
+    void loadRelated();
+    return () => {
+      cancelled = true;
+    };
+  }, [product]);
+
+  const uiModel = useMemo(() => {
+    if (!product) return null;
+
+    const imageSrc = resolveCatalogProductImageSrc(product);
+
+    const { colorEntries, sizes } = buildColorSizeOptionsFromProduct(product);
+
+    const rating = Number(product.rating ?? 0);
+    const price = Number(product.price ?? 0);
+    const originalPrice = product.original_price == null ? null : Number(product.original_price);
+
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description ?? "",
+      imageSrc,
+      rating: Number.isFinite(rating) ? rating : 0,
+      price: Number.isFinite(price) ? price : 0,
+      originalPrice: originalPrice != null && Number.isFinite(originalPrice) ? originalPrice : null,
+      discountLabel: product.discount_label ?? null,
+      colors: colorEntries,
+      sizes,
+    };
+  }, [product]);
+
+  const isComboValid = useMemo(() => {
+    const variants = product?.variants ?? [];
+    return (colorHex: string, sizeLabel: string) =>
+      variants.some(
+        (v) =>
+          normalizeVariantColor(String(v.color)) === normalizeVariantColor(colorHex) &&
+          normalizeVariantSize(String(v.size)) === normalizeVariantSize(sizeLabel),
+      );
+  }, [product]);
+
+  const handleSelectColor = useCallback(
+    (index: number) => {
+      setSelectedColor(index);
+      if (!uiModel) return;
+      const c = uiModel.colors[index]?.value ?? "";
+      setSelectedSize((prev) => {
+        const sizeVal = uiModel.sizes[prev] ?? "";
+        if (isComboValid(c, sizeVal)) return prev;
+        const next = uiModel.sizes.findIndex((s) => isComboValid(c, s));
+        return next >= 0 ? next : prev;
+      });
+    },
+    [uiModel, isComboValid],
+  );
+
+  const handleSelectSize = useCallback(
+    (index: number) => {
+      setSelectedSize(index);
+      if (!uiModel) return;
+      const s = uiModel.sizes[index] ?? "";
+      setSelectedColor((prev) => {
+        const colorVal = uiModel.colors[prev]?.value ?? "";
+        if (isComboValid(colorVal, s)) return prev;
+        const next = uiModel.colors.findIndex((col) => isComboValid(col.value, s));
+        return next >= 0 ? next : prev;
+      });
+    },
+    [uiModel, isComboValid],
+  );
+
+  const breadcrumbSegments = useMemo(() => (product ? buildProductBreadcrumbSegments(product) : []), [product]);
+
+  if (loading) {
+    return (
+      <main>
+        <Navigation />
+        <section className={styles.productSection}>
+          <div className={styles.container}>Loading...</div>
+        </section>
+        <Footer />
+      </main>
+    );
+  }
+
+  if (error || !uiModel) {
+    return (
+      <main>
+        <Navigation />
+        <section className={styles.productSection}>
+          <div className={styles.container}>{error ?? "Product not found."}</div>
+        </section>
+        <Footer />
+      </main>
+    );
+  }
+
+  async function handleAddToCart() {
+    setCartActionError(null);
+    if (!product || !uiModel) return;
+    const authSession = getAuthSession();
+    if (!authSession?.access) {
+      router.push(`/?auth=login&redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
+    setIsAddingToCart(true);
+    try {
+      /* Luôn dùng màu/size theo UI (uiModel) — thứ tự swatch/size khớp lựa chọn người dùng.
+         Dùng `fresh` chỉ để resolve id: thứ tự `variants` trên API có thể khác Set trên `fresh` vs `product`. */
+      const colorVal = uiModel.colors[selectedColor]?.value ?? "";
+      const sizeVal = String(uiModel.sizes[selectedSize] ?? "");
+      /* Bước 1: theo URL (slug hoặc id). Bước 2: luôn GET lại theo id số để có đủ variants[].id (slug→list đôi khi mỏng). */
+      let fresh = await fetchCatalogProductDetail(productID ?? product.id);
+      const pid = Number(fresh.id);
+      if (Number.isFinite(pid) && pid > 0) {
+        fresh = await fetchCatalogProductDetailByNumericId(pid);
+      }
+      setProduct(fresh);
+      const variantId = resolveVariantId(fresh, colorVal, sizeVal);
+      const catalogRequiresVariant = (fresh.variants?.length ?? 0) > 0;
+      const uiShowsVariantPickers = uiModel.colors.length > 0 && uiModel.sizes.length > 0;
+      if ((catalogRequiresVariant || uiShowsVariantPickers) && variantId == null) {
+        setCartActionError("Please select a valid color and size combination.");
+        return;
+      }
+      await addCartItem(fresh.id, quantity, variantId);
+      router.push("/cart");
+    } catch {
+      setCartActionError("Unable to add this product to cart. Please try again.");
+    } finally {
+      setIsAddingToCart(false);
+    }
+  }
 
   return (
     <main>
@@ -100,36 +345,36 @@ export default function ProductPage() {
         <div className={styles.container}>
           {/* Breadcrumb */}
           <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link href="/">Home</Link>
+            {breadcrumbSegments.map((seg, i) => (
+              <React.Fragment key={`${seg.href}-${seg.label}-${i}`}>
+                {i > 0 ? <span className={styles.breadcrumbSep}>&gt;</span> : null}
+                <Link href={seg.href}>{seg.label}</Link>
+              </React.Fragment>
+            ))}
             <span className={styles.breadcrumbSep}>&gt;</span>
-            <Link href="#">Shop</Link>
-            <span className={styles.breadcrumbSep}>&gt;</span>
-            <Link href="#">Men</Link>
-            <span className={styles.breadcrumbSep}>&gt;</span>
-            <span>T-shirts</span>
+            <span aria-current="page">{uiModel.name}</span>
           </nav>
 
           {/* Product layout: 2-column grid */}
           <div className={styles.productLayout}>
-            {/* Left: Thumbnails column + Main image */}
             <div className={styles.imageColumn}>
               <div className={styles.thumbnailsColumn}>
-                {product.images.slice(0, 3).map((src, i) => (
+                {Array.from({ length: PRODUCT_IMAGE_THUMB_SLOTS }, (_, i) => (
                   <button
-                    key={i}
+                    key={`product-image-thumb-${i}`}
                     type="button"
                     className={`${styles.thumb} ${selectedImage === i ? styles.thumbActive : ""}`}
                     onClick={() => setSelectedImage(i)}
-                    aria-label={`View image ${i + 1}`}
+                    aria-label={`Product image ${i + 1}`}
                   >
-                    <Image src={src} alt="" fill sizes="120px" className={styles.thumbImg} />
+                    <Image src={uiModel.imageSrc} alt="" fill sizes="120px" className={styles.thumbImg} />
                   </button>
                 ))}
               </div>
               <div className={styles.mainImage}>
                 <Image
-                  src={product.images[selectedImage]}
-                  alt={product.name}
+                  src={uiModel.imageSrc}
+                  alt={uiModel.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className={styles.mainImg}
@@ -140,40 +385,40 @@ export default function ProductPage() {
 
             {/* Right: Details */}
             <div className={styles.infoColumn}>
-              <h1 className={styles.productTitle}>{product.name}</h1>
+              <h1 className={styles.productTitle}>{uiModel.name}</h1>
               <div className={styles.ratingRow}>
                 <div className={styles.stars}>
                   {[1, 2, 3, 4, 5].map((i) => (
                     <span key={i} className={styles.starWrap}>
-                      <StarIcon filled={i <= Math.floor(product.rating)} />
+                      <StarIcon filled={i <= Math.floor(uiModel.rating)} />
                     </span>
                   ))}
                 </div>
-                <span className={styles.ratingText}>{product.rating}/5</span>
+                <span className={styles.ratingText}>{uiModel.rating}/5</span>
               </div>
               <div className={styles.priceRow}>
-                <span className={styles.price}>${product.price}</span>
-                {product.originalPrice && (
+                <span className={styles.price}>${uiModel.price}</span>
+                {uiModel.originalPrice && (
                   <>
-                    <span className={styles.originalPrice}>${product.originalPrice}</span>
-                    {product.discountLabel && (
-                      <span className={styles.discountTag}>{product.discountLabel}</span>
+                    <span className={styles.originalPrice}>${uiModel.originalPrice}</span>
+                    {uiModel.discountLabel && (
+                      <span className={styles.discountTag}>{uiModel.discountLabel}</span>
                     )}
                   </>
                 )}
               </div>
-              <p className={styles.description}>{product.description}</p>
+              <p className={styles.description}>{uiModel.description}</p>
 
               <div className={styles.optionGroup}>
                 <span className={styles.optionLabel}>Select Colors</span>
                 <div className={styles.colorSwatches}>
-                  {product.colors.map((c, i) => (
+                  {uiModel.colors.map((c, i) => (
                     <button
                       key={c.name}
                       type="button"
                       className={`${styles.colorSwatch} ${selectedColor === i ? styles.colorSwatchActive : ""}`}
                       style={{ backgroundColor: c.value }}
-                      onClick={() => setSelectedColor(i)}
+                      onClick={() => handleSelectColor(i)}
                       aria-label={c.name}
                       title={c.name}
                     >
@@ -187,16 +432,21 @@ export default function ProductPage() {
               <div className={styles.optionGroup}>
                 <span className={styles.optionLabel}>Choose Size</span>
                 <div className={styles.sizeButtons}>
-                  {product.sizes.map((s, i) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`${styles.sizeBtn} ${selectedSize === i ? styles.sizeBtnActive : ""}`}
-                      onClick={() => setSelectedSize(i)}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {uiModel.sizes.map((s, i) => {
+                    const colorForSize = uiModel.colors[selectedColor]?.value ?? "";
+                    const sizeUnavailable = !isComboValid(colorForSize, s);
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        disabled={sizeUnavailable}
+                        className={`${styles.sizeBtn} ${selectedSize === i ? styles.sizeBtnActive : ""} ${sizeUnavailable ? styles.sizeBtnDisabled : ""}`}
+                        onClick={() => handleSelectSize(i)}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <div className={styles.optionDivider} />
@@ -211,10 +461,16 @@ export default function ProductPage() {
                     +
                   </button>
                 </div>
-                <Link href="/cart" className={styles.addToCartBtn}>
-                  Add to Cart
-                </Link>
+                <button
+                  type="button"
+                  className={styles.addToCartBtn}
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                >
+                  {isAddingToCart ? "Adding..." : "Add to Cart"}
+                </button>
               </div>
+              {cartActionError && <p className={styles.description}>{cartActionError}</p>}
             </div>
           </div>
 
@@ -305,16 +561,22 @@ export default function ProductPage() {
           )}
           </div>
 
-          {/* You might also like */}
+          {/* You might also like — từ catalog theo category / dress-style */}
           <div className={styles.relatedSection}>
             <h2 className={styles.relatedTitle}>YOU MIGHT ALSO LIKE</h2>
-            <div className={styles.relatedGrid}>
-              {RELATED_PRODUCTS.map((p) => (
-                <Link key={p.id} href={`/product/${p.id}`} className={styles.relatedCard}>
-                  <ProductCard product={p} />
-                </Link>
-              ))}
-            </div>
+            {relatedLoading ? (
+              <p className={styles.tabContent}>Loading suggestions…</p>
+            ) : relatedProducts.length === 0 ? (
+              <p className={styles.tabContent}>No related products to show.</p>
+            ) : (
+              <div className={styles.relatedGrid}>
+                {relatedProducts.map((p) => (
+                  <Link key={p.id} href={`/product/${p.slug || p.id}`} className={styles.relatedCard}>
+                    <ProductCard product={p} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

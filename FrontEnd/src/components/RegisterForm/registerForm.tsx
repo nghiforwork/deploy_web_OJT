@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 import { LOGIN } from "@/constants/routes";
+import { registerUser, saveAuthSession } from "@/services/authService";
 import styles from "./registerForm.module.scss";
 
 interface RegisterFormProps {
@@ -11,12 +13,76 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ embedded }: RegisterFormProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const signinHref = embedded ? `${pathname}?auth=login` : LOGIN;
+
+  const extractErrorMessage = (err: unknown): string => {
+    if (!(err instanceof AxiosError)) return "Register failed. Please try again.";
+    const responseData = err.response?.data;
+    if (typeof responseData === "string") return responseData;
+    if (!responseData || typeof responseData !== "object") {
+      if (!err.response && err.code === "ERR_NETWORK") {
+        return "Cannot reach the server. Check that the API is running and NEXT_PUBLIC_API is correct.";
+      }
+      return err.response?.status ? `Request failed (${err.response.status}).` : "Register failed. Please try again.";
+    }
+    const o = responseData as Record<string, unknown>;
+    if (typeof o.detail === "string") return o.detail;
+    if (Array.isArray(o.detail) && o.detail.length > 0) return String(o.detail[0]);
+    const nfe = o.non_field_errors;
+    if (Array.isArray(nfe) && nfe.length > 0) return String(nfe[0]);
+    if (typeof nfe === "string") return nfe;
+    for (const v of Object.values(o)) {
+      if (Array.isArray(v) && v.length > 0) return String(v[0]);
+      if (typeof v === "string") return v;
+    }
+    return "Register failed. Please try again.";
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!agreeTerms) {
+      setError("Please agree to Terms of Service and Privacy Policy.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const reg = await registerUser({
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim(),
+        password,
+        confirm_password: confirmPassword,
+      });
+      /* Server đã trả access/refresh/user — không gọi login lần hai (dễ lỗi mạng/CORS và che lỗi đăng ký thật). */
+      saveAuthSession(reg);
+      setSuccess("Account created successfully. Redirecting...");
+      setPassword("");
+      setConfirmPassword("");
+      router.replace("/");
+    } catch (err) {
+      setError(extractErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const cardContent = (
     <div className={styles.card}>
@@ -25,7 +91,7 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
           <p className={styles.subtitle}>Join SHOP.CO and start shopping</p>
         </header>
 
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.nameRow}>
             <div className={styles.formGroup}>
               <label htmlFor="firstName" className={styles.label}>
@@ -37,6 +103,9 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
                 placeholder="John"
                 className={styles.input}
                 autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
               />
             </div>
             <div className={styles.formGroup}>
@@ -49,6 +118,9 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
                 placeholder="Doe"
                 className={styles.input}
                 autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -64,6 +136,9 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
                 placeholder="john.doe@example.com"
                 className={styles.input}
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
               <span className={styles.inputIcon} aria-hidden>
                 <MailIcon />
@@ -82,6 +157,9 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
                 placeholder="Create a strong password"
                 className={styles.input}
                 autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <button
                 type="button"
@@ -110,6 +188,9 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
                 placeholder="Confirm your password"
                 className={styles.input}
                 autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
               <button
                 type="button"
@@ -142,8 +223,11 @@ export default function RegisterForm({ embedded }: RegisterFormProps) {
             </label>
           </div>
 
-          <button type="submit" className={styles.btnPrimary}>
-            Create Account
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {success && <p className={styles.successMessage}>{success}</p>}
+
+          <button type="submit" className={styles.btnPrimary} disabled={loading}>
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
           <div className={styles.divider}>

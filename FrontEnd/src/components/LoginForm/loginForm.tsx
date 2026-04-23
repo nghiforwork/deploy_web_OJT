@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 import { User, Eye, EyeOff } from "lucide-react";
 import { SIGNUP } from "@/constants/routes";
+import { loginWithEmail, saveAuthSession } from "@/services/authService";
 import styles from "./loginForm.module.scss";
 
 interface LoginFormProps {
@@ -12,11 +14,59 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ embedded }: LoginFormProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const signupHref = embedded ? `${pathname}?auth=signup` : SIGNUP;
+
+  const extractErrorMessage = (err: unknown): string => {
+    if (!(err instanceof AxiosError)) return "Login failed. Please check your credentials.";
+    if (!err.response) {
+      return err.code === "ERR_NETWORK" ? "Cannot reach the server. Check that the API is running and NEXT_PUBLIC_API is correct." : "Login failed. Please check your credentials.";
+    }
+    const responseData = err.response.data;
+    if (typeof responseData === "string") return responseData;
+    if (!responseData || typeof responseData !== "object") {
+      return `Request failed (${err.response.status}).`;
+    }
+    const o = responseData as Record<string, unknown>;
+    if (typeof o.detail === "string") return o.detail;
+    if (Array.isArray(o.detail) && o.detail.length > 0) return String(o.detail[0]);
+    const nfe = o.non_field_errors;
+    if (Array.isArray(nfe) && nfe.length > 0) return String(nfe[0]);
+    if (typeof nfe === "string") return nfe;
+    for (const v of Object.values(o)) {
+      if (Array.isArray(v) && v.length > 0) return String(v[0]);
+      if (typeof v === "string") return v;
+    }
+    return "Login failed. Please check your credentials.";
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
+
+    try {
+      const authResponse = await loginWithEmail({ email: email.trim(), password });
+      saveAuthSession(authResponse);
+      setSuccess("Sign in successful. Redirecting...");
+      setPassword("");
+      router.replace("/");
+    } catch (err) {
+      setError(extractErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const cardContent = (
     <div className={styles.card}>
@@ -25,11 +75,11 @@ export default function LoginForm({ embedded }: LoginFormProps) {
         <p className={styles.subtitle}>Sign in to your SHOP.CO account</p>
       </header>
 
-      <form className={styles.form}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.field}>
           <label htmlFor="email" className={styles.label}>Email</label>
           <div className={styles.inputWrapper}>
-            <input id="email" type="email" placeholder="Enter your email" className={styles.input} autoComplete="email" />
+            <input id="email" type="email" placeholder="Enter your email" className={styles.input} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <User className={styles.inputIcon} size={20} aria-hidden />
           </div>
         </div>
@@ -37,7 +87,7 @@ export default function LoginForm({ embedded }: LoginFormProps) {
         <div className={styles.field}>
           <label htmlFor="password" className={styles.label}>Password</label>
           <div className={styles.inputWrapper}>
-            <input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" className={styles.input} autoComplete="current-password" />
+            <input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" className={styles.input} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <button type="button" className={styles.iconButton} onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>
               {showPassword ? <EyeOff className={styles.inputIcon} size={20} /> : <Eye className={styles.inputIcon} size={20} />}
             </button>
@@ -52,7 +102,12 @@ export default function LoginForm({ embedded }: LoginFormProps) {
           <Link href="/forgot-password" className={styles.forgotLink}>Forgot password?</Link>
         </div>
 
-        <button type="submit" className={styles.submitBtn}>Sign In</button>
+        {error && <p className={styles.errorMessage}>{error}</p>}
+        {success && <p className={styles.successMessage}>{success}</p>}
+
+        <button type="submit" className={styles.submitBtn} disabled={loading}>
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
 
         <div className={styles.divider}>
           <span className={styles.dividerText}>Or continue with</span>
